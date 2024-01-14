@@ -1,11 +1,14 @@
 import random
 import time
 
+import requests
 from selenium.webdriver.common.by import By
 
-from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, WebTablePageLocators, ButtonsPageLocators
+from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_person
+
 
 class TextBoxPage(BasePage):
     locators = TextBoxPageLocators()
@@ -30,8 +33,8 @@ class TextBoxPage(BasePage):
         permanent_address = self.element_is_present(self.locators.CREATED_PERMANENT_ADDRESS).text.split(":")[1]
         return full_name, email, current_address, permanent_address
 
-class CheckBoxPage(BasePage):
 
+class CheckBoxPage(BasePage):
     locators = CheckBoxPageLocators()
 
     def open_full_list(self):
@@ -45,7 +48,7 @@ class CheckBoxPage(BasePage):
             self.go_to_element(item)
             item.click()
             count -= 1
-            
+
     def get_checked_checkbox(self):
         checked_list = self.elements_are_present(self.locators.CHECKED_ELEMENT)
         data = []
@@ -63,22 +66,23 @@ class CheckBoxPage(BasePage):
 
 
 class RadioButtonPage(BasePage):
-
     locators = RadioButtonPageLocators()
+
     def choose_radio_button(self, choice):
         choices = {"yes": self.locators.YES_RADIO,
                    "impressive": self.locators.IMRESSIVE_RADIO,
                    "no": self.locators.NO_RADIO}
         self.element_is_visible(choices[choice]).click()
+
     def get_output_radiobutton(self):
         return self.element_is_present(self.locators.CHOOSEN_RADIO).text
 
+
 class WebTablePage(BasePage):
-
     locators = WebTablePageLocators()
-    def add_new_person(self, count = 1):
-        while count > 0:
 
+    def add_new_person(self, count=1):
+        while count > 0:
             person_info = next(generated_person())
             firstname = person_info.firstname
             lastname = person_info.lastname
@@ -95,7 +99,7 @@ class WebTablePage(BasePage):
             self.element_is_visible(self.locators.DEPARTAMENT_INPUT).send_keys(department)
             self.element_is_visible(self.locators.SUBMIT).click()
             count -= 1
-            return firstname, lastname, str(age), email,  str(salary), department
+            return firstname, lastname, str(age), email, str(salary), department
 
     def check_new_person(self):
         person_info = self.elements_are_present(self.locators.PERSON_INFO)
@@ -141,10 +145,10 @@ class WebTablePage(BasePage):
     def check_count_rows(self):
         list_rows = self.elements_are_present(self.locators.PERSON_INFO)
         return len(list_rows)
+
+
 class ButtonPage(BasePage):
-
     locators = ButtonsPageLocators()
-
 
     def click_on_different_button(self):
         self.action_double_click(self.element_is_visible(self.locators.DOUBLE_CLICK_ME))
@@ -154,13 +158,36 @@ class ButtonPage(BasePage):
                 self.check_click_result(self.locators.RIGHT_CLICK_RESULT),
                 self.check_click_result(self.locators.CLICK_ME_RESULT))
 
-
     def check_click_result(self, element):
         return self.element_is_present(element).text
 
 
+class LinkPage(BasePage):
+    locators = LinksPageLocators()
 
+    def check_new_tab_simple_link(self):
+        simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
+        link_href = simple_link.get_attribute("href")  # берет атрибут элемента из дом-дерева
+        request = requests.get(link_href)
+        if request.status_code == 200:
+            simple_link.click()
+            self.driver.switch_to.window(self.driver.window_handles[1])
+            url = self.driver.current_url
+            return link_href, url
+        else:
+            return f'Status code is {request.status_code}', link_href
 
-
-
-
+    def check_another_links(self):
+        simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
+        link_href = simple_link.get_attribute("href")  # берет атрибут элемента из дом-дерева
+        links_list = ["created", "no-content", "moved", "bad-request", "unauthorized", "forbidden", "invalid-url"]
+        links_locators_list = [self.locators.CREATED_LINK, self.locators.NO_CONTENT_LINK, self.locators.MOVED_LINK,
+                               self.locators.BED_REQUEST_LINK, self.locators.UNAUTHORIZED_LINK,
+                               self.locators.FORBIDDEN_LINK, self.locators.NOT_FOUND_LINK]
+        for i in range(len(links_list)):
+            request = requests.get(f"{link_href}{links_list[i]}")
+            if request.status_code == 200:
+                simple_link.click()
+                self.element_is_present(links_locators_list[i]).click()
+            else:
+                print(f'Status code is {request.status_code}, {self.element_is_present(links_locators_list[i]).text}')

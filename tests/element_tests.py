@@ -2,11 +2,12 @@ import random
 import time
 
 import locators.elements_page_locators
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage
 from conftest import driver
+
+
 class TestElements:
     class TestTextBox:
-
 
         def test_text_box(self, driver):
             text_box_page = TextBoxPage(driver, "https://demoqa.com/text-box")
@@ -49,15 +50,15 @@ class TestElements:
     class TestWebTable:
 
         def test_web_table_add_person(self, driver):
-           web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
-           web_table_page.open()
-           new_person = web_table_page.add_new_person()
-           table_result = web_table_page.check_new_person()
-           print(new_person)
-           print(table_result)
-           assert list(new_person) in table_result
+            web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
+            web_table_page.open()
+            new_person = web_table_page.add_new_person()
+            table_result = web_table_page.check_new_person()
+            print(new_person)
+            print(table_result)
+            assert list(new_person) in table_result
 
-           time.sleep(3)
+            time.sleep(3)
 
         def test_wev_table_search_person(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
@@ -66,7 +67,6 @@ class TestElements:
             web_table_page.search_person(key_word)
             table_result = web_table_page.check_serched_person()
             assert key_word in table_result, "Person wasn't found in the table"
-
 
         def test_web_table_update_person_info(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
@@ -94,8 +94,6 @@ class TestElements:
             count = web_table_page.select_up_to_some_rows()
             assert count == [5, 10, 20, 25, 50, 100], "The count rows can't be chosen"
 
-
-
     class TestButtonClick:
 
         def test_button_page_different_click(self, driver):
@@ -106,3 +104,16 @@ class TestElements:
                                     'You have done a right click',
                                     'You have done a dynamic click')
 
+    class TestLinksPage:
+
+        def test_check_link(self, driver):
+            link_page = LinkPage(driver, "https://demoqa.com/links")
+            link_page.open()
+            href_link, current_url = link_page.check_new_tab_simple_link()
+            assert href_link == current_url, "Current link has got another URL than expected"
+
+        def test_broken_links(self, driver):
+            link_page = LinkPage(driver, "https://demoqa.com/links")
+            link_page.open()
+            print()
+            link_page.check_another_links()

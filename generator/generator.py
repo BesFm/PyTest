@@ -18,3 +18,10 @@ def generated_person():
         current_Address=faker_ru.address(),
         permanent_Address=faker_ru.address(),
     )
+
+def generated_file():
+    path = rf"C:\Users\Bes.fm\Downloads\filetest{random.randint(0, 500)}.txt"
+    file = open(path, "w+")
+    file.write("Hello World")
+    file.close()
+    return file.name, path

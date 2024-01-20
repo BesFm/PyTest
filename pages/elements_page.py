@@ -1,3 +1,5 @@
+import base64
+import os
 import random
 import time
 
@@ -5,9 +7,9 @@ import requests
 from selenium.webdriver.common.by import By
 
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
-    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UpDownLoadPageLocators
 from pages.base_page import BasePage
-from generator.generator import generated_person
+from generator.generator import generated_person, generated_file
 
 
 class TextBoxPage(BasePage):
@@ -179,7 +181,7 @@ class LinkPage(BasePage):
 
     def check_another_links(self):
         simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
-        link_href = simple_link.get_attribute("href")  # берет атрибут элемента из дом-дерева
+        link_href = simple_link.get_attribute("href")  # берет атрибут "href" элемента из дом-дерева
         links_list = ["created", "no-content", "moved", "bad-request", "unauthorized", "forbidden", "invalid-url"]
         links_locators_list = [self.locators.CREATED_LINK, self.locators.NO_CONTENT_LINK, self.locators.MOVED_LINK,
                                self.locators.BED_REQUEST_LINK, self.locators.UNAUTHORIZED_LINK,
@@ -191,3 +193,36 @@ class LinkPage(BasePage):
                 self.element_is_present(links_locators_list[i]).click()
             else:
                 print(f'Status code is {request.status_code}, {self.element_is_present(links_locators_list[i]).text}')
+
+class UpDownLoadPage(BasePage):
+    locators = UpDownLoadPageLocators()
+
+    def upload_file(self):
+        file_name, path = generated_file()
+        self.element_is_visible(self.locators.UPLOAD_BUTTON).send_keys(path)
+        uploaded_file_path = self.element_is_present(self.locators.UPLOAD_FILE_PATH).text
+        time.sleep(3)
+        os.remove(path)
+        return file_name.split("\\")[-1], uploaded_file_path.split("\\")[-1]
+
+    # def download_file(self):
+    #     download_button = self.element_is_visible(self.locators.DOWNLOAD_BUTTON)
+    #     file_name = download_button.get_attribute("download")
+    #     download_path = rf"C:\Users\Bes.fm\Downloads"
+    #     download_button.click()
+    #     time.sleep(3)
+    #     result = os.path.exists(rf"{download_path}\{file_name}")
+    #     os.remove(rf"{download_path}\{file_name}")
+    #     return result
+
+    def download_file(self):
+        link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute("href")
+        link_b = base64.b64decode(link.split(",")[1])
+        path_name_file = rf"C:\Users\Bes.fm\Downloads\filetest{random.randint(0, 500)}.jpeg"
+        with open(path_name_file, "wb+") as f:
+            f.write(link_b)
+            check_file = os.path.exists(path_name_file)
+            f.close()
+        time.sleep(3)
+        os.remove(path_name_file)
+        return check_file

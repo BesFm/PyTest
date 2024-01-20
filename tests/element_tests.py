@@ -2,7 +2,8 @@ import random
 import time
 
 import locators.elements_page_locators
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage, \
+    UpDownLoadPage
 from conftest import driver
 
 
@@ -117,3 +118,18 @@ class TestElements:
             link_page.open()
             print()
             link_page.check_another_links()
+
+    class TestUploadAndDownload:
+
+        def test_upload(self, driver):
+            upload_download_page = UpDownLoadPage(driver, "https://demoqa.com/upload-download")
+            upload_download_page.open()
+            file_name, uploaded_file_path = upload_download_page.upload_file()
+            assert file_name == uploaded_file_path, "Chosen file isn't uploaded"
+
+        def test_download(self, driver):
+            upload_download_page = UpDownLoadPage(driver, "https://demoqa.com/upload-download")
+            upload_download_page.open()
+            result = upload_download_page.download_file()
+            assert result is True, "File isn't downloaded"
+

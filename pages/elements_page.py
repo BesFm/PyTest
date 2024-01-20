@@ -4,10 +4,11 @@ import random
 import time
 
 import requests
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
-    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UpDownLoadPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UpDownLoadPageLocators, DynamicPropertiesPageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_person, generated_file
 
@@ -194,6 +195,7 @@ class LinkPage(BasePage):
             else:
                 print(f'Status code is {request.status_code}, {self.element_is_present(links_locators_list[i]).text}')
 
+
 class UpDownLoadPage(BasePage):
     locators = UpDownLoadPageLocators()
 
@@ -204,16 +206,6 @@ class UpDownLoadPage(BasePage):
         time.sleep(3)
         os.remove(path)
         return file_name.split("\\")[-1], uploaded_file_path.split("\\")[-1]
-
-    # def download_file(self):
-    #     download_button = self.element_is_visible(self.locators.DOWNLOAD_BUTTON)
-    #     file_name = download_button.get_attribute("download")
-    #     download_path = rf"C:\Users\Bes.fm\Downloads"
-    #     download_button.click()
-    #     time.sleep(3)
-    #     result = os.path.exists(rf"{download_path}\{file_name}")
-    #     os.remove(rf"{download_path}\{file_name}")
-    #     return result
 
     def download_file(self):
         link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute("href")
@@ -226,3 +218,48 @@ class UpDownLoadPage(BasePage):
         time.sleep(3)
         os.remove(path_name_file)
         return check_file
+
+
+class DynamicPropertiesPage(BasePage):
+    locators = DynamicPropertiesPageLocators()
+
+    def check_page_buttons(self):
+        color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
+        color_button_before = color_button.value_of_css_property("color")
+        time.sleep(5)
+        color_button_after = color_button.value_of_css_property("color")
+        color_changed = color_button_before != color_button_after
+
+        try:
+            self.element_is_clickable(self.locators.ENABLE_IN_BUTTON)
+        except TimeoutException:
+            not_av_button_enable = False
+        not_av_button_enable = True
+
+        try:
+            self.element_is_visible(self.locators.VISIBLE_IN_BUTTON)
+        except TimeoutException:
+            not_vis_button_enable = False
+        not_vis_button_enable = True
+
+        return not_av_button_enable, color_changed, not_vis_button_enable
+
+    def check_enable_button(self):
+        try:
+            self.element_is_clickable(self.locators.ENABLE_IN_BUTTON)
+        except TimeoutException:
+            return False
+        return True
+    def check_changed_color(self):
+        color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
+        color_button_before = color_button.value_of_css_property("color")
+        time.sleep(5)
+        color_button_after = color_button.value_of_css_property("color")
+        return color_button_after, color_button_before
+
+    def check_appear_button(self):
+        try:
+            self.element_is_visible(self.locators.VISIBLE_IN_BUTTON)
+        except TimeoutException:
+            return False
+        return True

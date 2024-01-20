@@ -3,7 +3,7 @@ import time
 
 import locators.elements_page_locators
 from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage, \
-    UpDownLoadPage
+    UpDownLoadPage, DynamicPropertiesPage
 from conftest import driver
 
 
@@ -133,3 +133,30 @@ class TestElements:
             result = upload_download_page.download_file()
             assert result is True, "File isn't downloaded"
 
+    class TestDynamicProperties:
+        # отсчет времени начинается после появления начальных кнопок (в каждом тесте этого класса)
+        def test_all_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
+            dynamic_properties_page.open()
+            button_enabled, color_changed, button_visible = dynamic_properties_page.check_page_buttons()
+            assert button_enabled is True, "'Enable after 5sec' Button isn't available after timeout"
+            assert color_changed is True, "Button color isn't changed after timeout"
+            assert button_visible is True, "Button isn't appear after timeout"
+
+        def test_enable_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
+            dynamic_properties_page.open()
+            button_is_enable = dynamic_properties_page.check_enable_button()
+            assert button_is_enable is True, "'Enable after 5sec' Button isn't available after timeout"
+
+        def test_color_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
+            dynamic_properties_page.open()
+            color_after, color_before = dynamic_properties_page.check_changed_color()
+            assert color_after != color_before, "Button color isn't changed after timeout"
+
+        def test_appear_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
+            dynamic_properties_page.open()
+            button_is_appear = dynamic_properties_page.check_appear_button()
+            assert button_is_appear is True, "Button isn't appear after timeout"

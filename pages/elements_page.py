@@ -114,7 +114,7 @@ class WebTablePage(BasePage):
     def search_person(self, key_words):
         self.element_is_visible(self.locators.SEARCH_FIELD).send_keys(key_words)
 
-    def check_serched_person(self):
+    def check_searched_person(self):
         delete_button = self.element_is_present(self.locators.DELETE_BUTTON)
         row = delete_button.find_element("xpath", self.locators.ROW_PARENT)
         return row.text.splitlines()
@@ -230,17 +230,17 @@ class DynamicPropertiesPage(BasePage):
         color_button_after = color_button.value_of_css_property("color")
         color_changed = color_button_before != color_button_after
 
+        not_av_button_enable = True
         try:
             self.element_is_clickable(self.locators.ENABLE_IN_BUTTON)
         except TimeoutException:
             not_av_button_enable = False
-        not_av_button_enable = True
 
+        not_vis_button_enable = True
         try:
             self.element_is_visible(self.locators.VISIBLE_IN_BUTTON)
         except TimeoutException:
             not_vis_button_enable = False
-        not_vis_button_enable = True
 
         return not_av_button_enable, color_changed, not_vis_button_enable
 
@@ -250,6 +250,7 @@ class DynamicPropertiesPage(BasePage):
         except TimeoutException:
             return False
         return True
+
     def check_changed_color(self):
         color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
         color_button_before = color_button.value_of_css_property("color")

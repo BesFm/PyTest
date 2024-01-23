@@ -1,7 +1,6 @@
 import random
 import time
 
-import locators.elements_page_locators
 from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage, \
     UpDownLoadPage, DynamicPropertiesPage
 from conftest import driver
@@ -135,6 +134,7 @@ class TestElements:
 
     class TestDynamicProperties:
         # отсчет времени начинается после появления начальных кнопок (в каждом тесте этого класса)
+        # отсчет timeout начинается после окончания загрузки страницы
         def test_all_button(self, driver):
             dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
             dynamic_properties_page.open()

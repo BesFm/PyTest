@@ -1,5 +1,6 @@
 from pages.forms_page import FormsPage
 from conftest import driver
+import os
 
 
 class TestForms:
@@ -15,8 +16,9 @@ class TestForms:
         filename = forms_page.check_upload()
         state_city = forms_page.check_dropdown()
         forms_page.check_submit_butt()
+        os.remove(filename)
         input_info = [f"{firstname} {lastname}", email, gender, str(mobile), f"{day} {month},{year}",
-                      subjects, hobbies, filename, address, state_city]
+                      subjects, hobbies, filename.split("\\")[-1], address, state_city]
         output_info = forms_page.get_all_fields()
         assert input_info == output_info, "Invalid info"
 

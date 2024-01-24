@@ -51,7 +51,7 @@ class FormsPage(BasePage):
     def check_upload(self):
         path = generated_file()
         self.element_is_visible(self.locators.UPLOAD_PICTURE).send_keys(path)
-        return path.split("\\")[-1]
+        return path
 
     def check_dropdown(self):
         state, city = generated_state()
@@ -63,9 +63,7 @@ class FormsPage(BasePage):
         return f"{state} {city}"
 
     def check_submit_butt(self):
-        path = generated_file()
         self.element_is_visible(self.locators.SUBMIT_BUTTON).click()
-        os.remove(path)                         # Удалить сгенерированый файл (можно только после sumbit'а)
 
     def get_all_fields(self):
         student_info = self.elements_are_visible(self.locators.OUTPUT_INFO)

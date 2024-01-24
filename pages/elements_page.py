@@ -200,12 +200,12 @@ class UpDownLoadPage(BasePage):
     locators = UpDownLoadPageLocators()
 
     def upload_file(self):
-        file_name, path = generated_file()
+        path = generated_file()
         self.element_is_visible(self.locators.UPLOAD_BUTTON).send_keys(path)
         uploaded_file_path = self.element_is_present(self.locators.UPLOAD_FILE_PATH).text
         time.sleep(3)
         os.remove(path)
-        return file_name.split("\\")[-1], uploaded_file_path.split("\\")[-1]
+        return path.split("\\")[-1], uploaded_file_path.split("\\")[-1]
 
     def download_file(self):
         link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute("href")

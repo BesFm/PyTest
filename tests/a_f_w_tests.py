@@ -1,5 +1,5 @@
 from conftest import driver
-from pages.a_f_w_page import BrowserWindowsPage, AlertsPage, FramesPage
+from pages.a_f_w_page import BrowserWindowsPage, AlertsPage, FramesPage, NestedFramesPage
 
 
 class TestAlertsFrameWindows:
@@ -54,3 +54,12 @@ class TestAlertsFrameWindows:
             assert fheight1 != fheight2, "Frame's height's equal or it's same frame"
             assert ftext1 == "This is a sample page", "Frame's content differs from expected"
             assert ftext2 == "This is a sample page", "Frame's content differs from expected"
+
+    class TestNestedFrames:
+
+        def test_nested_frames(self, driver):
+            nestframes_page = NestedFramesPage(driver, "https://demoqa.com/nestedframes")
+            nestframes_page.open()
+            lframe_text, sframe_text = nestframes_page.check_nested_frames()
+            assert lframe_text == "Parent frame", "Frame's content differs from expected"
+            assert sframe_text == "Child Iframe", "Frame's content differs from expected"

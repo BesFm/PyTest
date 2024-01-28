@@ -2,7 +2,8 @@ import random
 import time
 
 from pages.base_page import BasePage
-from locators.a_f_w_page_locators import BrowserWindowsPageLocators, AlertsPageLocators, FramePageLocators
+from locators.a_f_w_page_locators import (BrowserWindowsPageLocators, AlertsPageLocators, FramePageLocators,
+                                          NestedFramesLocators)
 from generator.generator import generated_person
 
 
@@ -60,3 +61,16 @@ class FramesPage(BasePage):
         frame_text = self.element_is_visible(self.locators.RESPONSE_FRAME).text
         self.driver.switch_to.default_content()
         return width, height, frame_text
+
+
+class NestedFramesPage(BasePage):
+    locators = NestedFramesLocators()
+
+    def check_nested_frames(self):
+        lframe = self.element_is_visible(self.locators.LARGE_FRAME)
+        self.driver.switch_to.frame(lframe)
+        lframe_text = self.element_is_visible(self.locators.LFRAME_TEXT).text
+        sframe = self.element_is_visible(self.locators.SMALL_FRAME)
+        self.driver.switch_to.frame(sframe)
+        sframe_text = self.element_is_present(self.locators.SFRAME_TEXT).text
+        return lframe_text, sframe_text

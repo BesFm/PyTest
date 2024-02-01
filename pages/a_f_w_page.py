@@ -3,7 +3,7 @@ import time
 
 from pages.base_page import BasePage
 from locators.a_f_w_page_locators import (BrowserWindowsPageLocators, AlertsPageLocators, FramePageLocators,
-                                          NestedFramesLocators)
+                                          NestedFramesLocators, ModalPageLocators)
 from generator.generator import generated_person
 
 
@@ -74,3 +74,19 @@ class NestedFramesPage(BasePage):
         self.driver.switch_to.frame(sframe)
         sframe_text = self.element_is_present(self.locators.SFRAME_TEXT).text
         return lframe_text, sframe_text
+
+
+class ModalDialogsPage(BasePage):
+    locators = ModalPageLocators()
+
+    def call_small_modal(self):
+        self.element_is_visible(self.locators.OPEN_SMALL_MODAL).click()
+        small_modal_header = self.element_is_visible(self.locators.MODAL_HEADER).text
+        self.element_is_visible(self.locators.CLOSE_SMALL_MODAL).click()
+        return small_modal_header
+
+    def call_large_modal(self):
+        self.element_is_visible(self.locators.OPEN_LARGE_MODAL).click()
+        large_modal_header = self.element_is_visible(self.locators.MODAL_HEADER).text
+        self.element_is_visible(self.locators.CLOSE_LARGE_MODAL).click()
+        return large_modal_header

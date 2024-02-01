@@ -1,5 +1,5 @@
 from conftest import driver
-from pages.a_f_w_page import BrowserWindowsPage, AlertsPage, FramesPage, NestedFramesPage
+from pages.a_f_w_page import BrowserWindowsPage, AlertsPage, FramesPage, NestedFramesPage, ModalDialogsPage
 
 
 class TestAlertsFrameWindows:
@@ -63,3 +63,13 @@ class TestAlertsFrameWindows:
             lframe_text, sframe_text = nestframes_page.get_nested_frames_content()
             assert lframe_text == "Parent frame", "Frame's content differs from expected"
             assert sframe_text == "Child Iframe", "Frame's content differs from expected"
+
+    class TestModalDialogs:
+
+        def test_modal_dialogs(self, driver):
+            modal_dialogs_page = ModalDialogsPage(driver, "https://demoqa.com/modal-dialogs")
+            modal_dialogs_page.open()
+            small_modal_header = modal_dialogs_page.call_small_modal()
+            large_modal_header = modal_dialogs_page.call_large_modal()
+            assert small_modal_header == "Small Modal", "Modal's content difference from expected or not opened"
+            assert large_modal_header == "Large Modal", "Modal's content difference from expected or not opened"

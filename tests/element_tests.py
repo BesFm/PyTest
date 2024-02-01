@@ -13,7 +13,7 @@ class TestElements:
             text_box_page = TextBoxPage(driver, "https://demoqa.com/text-box")
             text_box_page.open()
             full_name, email, current_address, permanent_address = text_box_page.fill_all_fields()
-            output_name, output_email, output_curr_addr, output_perm_addr = text_box_page.check_filled_form()
+            output_name, output_email, output_curr_addr, output_perm_addr = text_box_page.get_output_info()
             assert full_name == output_name, "ошибка имени"
             assert email == output_email, "ошибка email"
             assert current_address == output_curr_addr, "ошибка текущего адреса"
@@ -23,7 +23,7 @@ class TestElements:
         def test_check_box(self, driver):
             check_box_page = CheckBoxPage(driver, "https://demoqa.com/checkbox")
             check_box_page.open()
-            check_box_page.open_full_list()
+            check_box_page.open_full_checkbox_list()
             check_box_page.click_random_checkbox()
             input_checkbox = check_box_page.get_checked_checkbox()
             output_checkbox = check_box_page.get_output_checkbox()
@@ -37,11 +37,11 @@ class TestElements:
         def test_radio_button(self, driver):
             radio_button_page = RadioButtonPage(driver, "https://demoqa.com/radio-button")
             radio_button_page.open()
-            radio_button_page.choose_radio_button('yes')
+            radio_button_page.click_radio_button('yes')
             output_yes = radio_button_page.get_output_radiobutton()
-            radio_button_page.choose_radio_button('impressive')
+            radio_button_page.click_radio_button('impressive')
             output_impressive = radio_button_page.get_output_radiobutton()
-            radio_button_page.choose_radio_button('no')
+            radio_button_page.click_radio_button('no')
             output_no = radio_button_page.get_output_radiobutton()
             assert output_yes == "Yes", "RadioButton 'Yes' not valid"
             assert output_impressive == "Impressive", "RadioButton 'Impressive' not valid"
@@ -53,7 +53,7 @@ class TestElements:
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
             new_person = web_table_page.add_new_person()
-            table_result = web_table_page.check_new_person()
+            table_result = web_table_page.get_new_person_info()
             print(new_person)
             print(table_result)
             assert list(new_person) in table_result
@@ -65,7 +65,7 @@ class TestElements:
             web_table_page.open()
             key_word = web_table_page.add_new_person()[random.randint(0, 5)]
             web_table_page.search_person(key_word)
-            table_result = web_table_page.check_serched_person()
+            table_result = web_table_page.get_searched_person_info()
             assert key_word in table_result, "Person wasn't found in the table"
 
         def test_web_table_update_person_info(self, driver):
@@ -74,7 +74,7 @@ class TestElements:
             lastname = web_table_page.add_new_person()[1]
             web_table_page.search_person(lastname)
             age = web_table_page.update_person_info()
-            row = web_table_page.check_serched_person()
+            row = web_table_page.get_new_person_info()
             print(str(age))
             print(row)
             assert age in row, "The Person card hasn't been changed"
@@ -84,8 +84,7 @@ class TestElements:
             web_table_page.open()
             email = web_table_page.add_new_person()[3]
             web_table_page.search_person(email)
-            web_table_page.delete_person()
-            result = web_table_page.check_deleted()
+            result = web_table_page.delete_person()
             assert result == "No rows found", "The Person card hasn't been deleted"
 
         def test_web_table_change_count_row(self, driver):
@@ -109,14 +108,14 @@ class TestElements:
         def test_check_link(self, driver):
             link_page = LinkPage(driver, "https://demoqa.com/links")
             link_page.open()
-            href_link, current_url = link_page.check_new_tab_simple_link()
+            href_link, current_url = link_page.click_new_tab_simple_link()
             assert href_link == current_url, "Current link has got another URL than expected"
 
         def test_broken_links(self, driver):
             link_page = LinkPage(driver, "https://demoqa.com/links")
             link_page.open()
             print()
-            link_page.check_another_links()
+            link_page.click_another_links()
 
     class TestUploadAndDownload:
 
@@ -138,7 +137,7 @@ class TestElements:
         def test_all_button(self, driver):
             dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
             dynamic_properties_page.open()
-            button_enabled, color_changed, button_visible = dynamic_properties_page.check_page_buttons()
+            button_enabled, color_changed, button_visible = dynamic_properties_page.click_page_buttons()
             assert button_enabled is True, "'Enable after 5sec' Button isn't available after timeout"
             assert color_changed is True, "Button color isn't changed after timeout"
             assert button_visible is True, "Button isn't appear after timeout"
@@ -146,17 +145,17 @@ class TestElements:
         def test_enable_button(self, driver):
             dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
             dynamic_properties_page.open()
-            button_is_enable = dynamic_properties_page.check_enable_button()
+            button_is_enable = dynamic_properties_page.click_enable_button()
             assert button_is_enable is True, "'Enable after 5sec' Button isn't available after timeout"
 
         def test_color_button(self, driver):
             dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
             dynamic_properties_page.open()
-            color_after, color_before = dynamic_properties_page.check_changed_color()
+            color_after, color_before = dynamic_properties_page.click_changed_color()
             assert color_after != color_before, "Button color isn't changed after timeout"
 
         def test_appear_button(self, driver):
             dynamic_properties_page = DynamicPropertiesPage(driver, "https://demoqa.com/dynamic-properties")
             dynamic_properties_page.open()
-            button_is_appear = dynamic_properties_page.check_appear_button()
+            button_is_appear = dynamic_properties_page.click_appear_button()
             assert button_is_appear is True, "Button isn't appear after timeout"

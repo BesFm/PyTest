@@ -10,7 +10,7 @@ from generator.generator import generated_person
 class BrowserWindowsPage(BasePage):
     locators = BrowserWindowsPageLocators()
 
-    def check_button(self, button):
+    def open_tab_or_window(self, button):
         dictic = {"new_tab": self.locators.NEW_TAB_BUTTON, "new_window": self.locators.NEW_WINDOW_BUTTON}
         self.element_is_visible(dictic[button]).click()
         self.switch_to_tab(self.driver.window_handles[-1])
@@ -21,14 +21,14 @@ class BrowserWindowsPage(BasePage):
 class AlertsPage(BasePage):
     locators = AlertsPageLocators()
 
-    def check_alert_buttons(self, button):
+    def call_simple_time_alert(self, button):
         dictic = {"simple": [self.locators.SIMPLE_ALERT_BUTTON, 0], "time": [self.locators.TIME_ALERT_BUTTON, 5]}
         self.element_is_visible(dictic[button][0]).click()
         time.sleep(dictic[button][1])
         alert_window = self.driver.switch_to.alert
         return alert_window.text
 
-    def check_confirm_alert(self):
+    def call_confirm_alert(self):
         self.element_is_visible(self.locators.CONFIRM_ALERT_BUTTON).click()
         alert_window = self.driver.switch_to.alert
         var = ["accept", "dismiss"]
@@ -40,7 +40,7 @@ class AlertsPage(BasePage):
         dictic = {var[0]: "You selected Ok", var[1]: "You selected Cancel"}
         return dictic[choice], self.element_is_visible(self.locators.CONFIRM_RESULT).text
 
-    def check_prompt_alert(self):
+    def call_prompt_alert(self):
         fullname = next(generated_person()).full_name
         self.element_is_visible(self.locators.PROMPT_ALERT_BUTTON).click()
         alert_window = self.driver.switch_to.alert
@@ -52,7 +52,7 @@ class AlertsPage(BasePage):
 class FramesPage(BasePage):
     locators = FramePageLocators()
 
-    def check_frame(self, frame_num):
+    def get_frame_content(self, frame_num):
         dictic = {"frame1": self.locators.FIRST_FRAME, "frame2": self.locators.SECOND_FRAME}
         frame = self.element_is_visible(dictic[frame_num])
         width = frame.get_attribute("width")
@@ -66,7 +66,7 @@ class FramesPage(BasePage):
 class NestedFramesPage(BasePage):
     locators = NestedFramesLocators()
 
-    def check_nested_frames(self):
+    def get_nested_frames_content(self):
         lframe = self.element_is_visible(self.locators.LARGE_FRAME)
         self.driver.switch_to.frame(lframe)
         lframe_text = self.element_is_visible(self.locators.LFRAME_TEXT).text

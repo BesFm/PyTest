@@ -29,7 +29,7 @@ class TextBoxPage(BasePage):
         self.element_is_clickable(self.locators.SUBMIT).click()
         return full_name, email, current_address, permanent_address
 
-    def check_filled_form(self):
+    def get_output_info(self):
         full_name = self.element_is_present(self.locators.CREATED_FULL_NAME).text.split(":")[1]
         email = self.element_is_present(self.locators.CREATED_EMAIL).text.split(":")[1]
         current_address = self.element_is_present(self.locators.CREATED_CURRENT_ADDRESS).text.split(":")[1]
@@ -40,7 +40,7 @@ class TextBoxPage(BasePage):
 class CheckBoxPage(BasePage):
     locators = CheckBoxPageLocators()
 
-    def open_full_list(self):
+    def open_full_checkbox_list(self):
         self.element_is_visible(self.locators.EXPAND_ALL).click()
 
     def click_random_checkbox(self):
@@ -71,14 +71,14 @@ class CheckBoxPage(BasePage):
 class RadioButtonPage(BasePage):
     locators = RadioButtonPageLocators()
 
-    def choose_radio_button(self, choice):
+    def click_radio_button(self, choice):
         choices = {"yes": self.locators.YES_RADIO,
                    "impressive": self.locators.IMRESSIVE_RADIO,
                    "no": self.locators.NO_RADIO}
         self.element_is_visible(choices[choice]).click()
 
     def get_output_radiobutton(self):
-        return self.element_is_present(self.locators.CHOOSEN_RADIO).text
+        return self.element_is_present(self.locators.CHOSEN_RADIO).text
 
 
 class WebTablePage(BasePage):
@@ -104,7 +104,7 @@ class WebTablePage(BasePage):
             count -= 1
             return firstname, lastname, str(age), email, str(salary), department
 
-    def check_new_person(self):
+    def get_new_person_info(self):
         person_info = self.elements_are_present(self.locators.PERSON_INFO)
         data = []
         for item in person_info:
@@ -114,7 +114,7 @@ class WebTablePage(BasePage):
     def search_person(self, key_words):
         self.element_is_visible(self.locators.SEARCH_FIELD).send_keys(key_words)
 
-    def check_searched_person(self):
+    def get_searched_person_info(self):
         delete_button = self.element_is_present(self.locators.DELETE_BUTTON)
         row = delete_button.find_element("xpath", self.locators.ROW_PARENT)
         return row.text.splitlines()
@@ -130,9 +130,7 @@ class WebTablePage(BasePage):
 
     def delete_person(self):
         self.element_is_visible(self.locators.DELETE_BUTTON).click()
-
-    def check_deleted(self):
-        return self.element_is_present(self.locators.CHEK_DELETED).text
+        return self.element_is_present(self.locators.CHECK_DELETED).text
 
     def select_up_to_some_rows(self):
         count = [5, 10, 20, 25, 50, 100]
@@ -142,10 +140,10 @@ class WebTablePage(BasePage):
             self.go_to_element(count_row_button)
             count_row_button.click()
             self.element_is_visible((By.CSS_SELECTOR, f"option[value='{x}']")).click()
-            data.append(self.check_count_rows())
+            data.append(self.get_count_rows())
         return data
 
-    def check_count_rows(self):
+    def get_count_rows(self):
         list_rows = self.elements_are_present(self.locators.PERSON_INFO)
         return len(list_rows)
 
@@ -157,18 +155,18 @@ class ButtonPage(BasePage):
         self.action_double_click(self.element_is_visible(self.locators.DOUBLE_CLICK_ME))
         self.action_right_click(self.element_is_visible(self.locators.RIGHT_CLICK_ME))
         self.element_is_visible(self.locators.CLICK_ME).click()
-        return (self.check_click_result(self.locators.DOUBLE_CLICK_RESULT),
-                self.check_click_result(self.locators.RIGHT_CLICK_RESULT),
-                self.check_click_result(self.locators.CLICK_ME_RESULT))
+        return (self.get_click_result(self.locators.DOUBLE_CLICK_RESULT),
+                self.get_click_result(self.locators.RIGHT_CLICK_RESULT),
+                self.get_click_result(self.locators.CLICK_ME_RESULT))
 
-    def check_click_result(self, element):
+    def get_click_result(self, element):
         return self.element_is_present(element).text
 
 
 class LinkPage(BasePage):
     locators = LinksPageLocators()
 
-    def check_new_tab_simple_link(self):
+    def click_new_tab_simple_link(self):
         simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
         link_href = simple_link.get_attribute("href")  # берет атрибут элемента из дом-дерева
         request = requests.get(link_href)
@@ -180,7 +178,7 @@ class LinkPage(BasePage):
         else:
             return f'Status code is {request.status_code}', link_href
 
-    def check_another_links(self):
+    def click_another_links(self):
         simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
         link_href = simple_link.get_attribute("href")  # берет атрибут "href" элемента из дом-дерева
         links_list = ["created", "no-content", "moved", "bad-request", "unauthorized", "forbidden", "invalid-url"]
@@ -223,7 +221,7 @@ class UpDownLoadPage(BasePage):
 class DynamicPropertiesPage(BasePage):
     locators = DynamicPropertiesPageLocators()
 
-    def check_page_buttons(self):
+    def click_page_buttons(self):
         color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
         color_button_before = color_button.value_of_css_property("color")
         time.sleep(5)
@@ -244,21 +242,21 @@ class DynamicPropertiesPage(BasePage):
 
         return not_av_button_enable, color_changed, not_vis_button_enable
 
-    def check_enable_button(self):
+    def click_enable_button(self):
         try:
             self.element_is_clickable(self.locators.ENABLE_IN_BUTTON)
         except TimeoutException:
             return False
         return True
 
-    def check_changed_color(self):
+    def click_changed_color(self):
         color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
         color_button_before = color_button.value_of_css_property("color")
         time.sleep(5)
         color_button_after = color_button.value_of_css_property("color")
         return color_button_after, color_button_before
 
-    def check_appear_button(self):
+    def click_appear_button(self):
         try:
             self.element_is_visible(self.locators.VISIBLE_IN_BUTTON)
         except TimeoutException:

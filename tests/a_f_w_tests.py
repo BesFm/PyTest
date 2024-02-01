@@ -71,5 +71,5 @@ class TestAlertsFrameWindows:
             modal_dialogs_page.open()
             small_modal_header = modal_dialogs_page.call_small_modal()
             large_modal_header = modal_dialogs_page.call_large_modal()
-            assert small_modal_header == "Small Modal", "Modal's content difference from expected or not opened"
-            assert large_modal_header == "Large Modal", "Modal's content difference from expected or not opened"
+            assert small_modal_header == "Small Modal", "Modal's content difference from expected"
+            assert large_modal_header == "Large Modal", "Modal's content difference from expected"

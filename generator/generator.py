@@ -1,6 +1,6 @@
 import random
 
-from Data.data import Person
+from Data.data import Person, Colors
 from faker import Faker
 
 faker_ru = Faker("ru_RU")
@@ -44,3 +44,7 @@ def generated_state():
     state_city_list = {"NCR": ["Delhi", "Gurgaon", "Noida"], "Uttar Pradesh": ["Agra", "Lucknow", "Merrut"],
                        "Haryana": ["Karnal", "Panipat"], "Rajasthan": ["Jaipur", "Jaiselmer"]}
     return state, random.choice(state_city_list[state])
+
+
+def generated_colors():
+    return ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White", "Voilet", "Indigo", "Magenta", "Aqua"]

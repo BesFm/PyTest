@@ -18,5 +18,8 @@ class Person:
 
 
 @dataclass
-class Colors:
-    colors: list = None
+class Date:
+    year: str = None
+    month: str = None
+    day: str = None
+    time: str = None

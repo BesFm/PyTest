@@ -1,5 +1,5 @@
 from conftest import driver
-from pages.widgets_page import AccordianPage, AutoCompletePage
+from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage
 import random
 
 
@@ -31,3 +31,17 @@ class TestWidgets:
             assert mult_input_colors == mult_input_result, "Result colors difference from input colors"
             assert mult_remove_result is None, "Colors isn,t removed"
             assert single_input_colors == single_input_result, "Result colors difference from input colors"
+
+    class TestDataPicker:
+
+        def test_date_picker(self, driver):
+            date_picker_page = DatePickerPage(driver, "https://demoqa.com/date-picker")
+            date_picker_page.open()
+            input_date, output_date = date_picker_page.set_date()
+            assert input_date != output_date, "Date hasn't changed"
+
+        def test_time_date_picker(self, driver):
+            date_picker_page = DatePickerPage(driver, "https://demoqa.com/date-picker")
+            date_picker_page.open()
+            input_date, output_date = date_picker_page.set_time_date()
+            assert input_date != output_date, "Date hasn't changed"

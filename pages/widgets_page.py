@@ -2,10 +2,11 @@ import random
 
 from selenium.common import TimeoutException
 from selenium.webdriver import Keys
+from selenium.webdriver.support.select import Select
 
 from pages.base_page import BasePage
-from locators.widgets_page_locators import AccordianPageLocators, AutoCompletePageLocators
-from generator.generator import generated_colors
+from locators.widgets_page_locators import AccordianPageLocators, AutoCompletePageLocators, DatePickerPageLocators
+from generator.generator import generated_colors, generated_date
 
 
 class AccordianPage(BasePage):
@@ -66,3 +67,54 @@ class AutoCompletePage(BasePage):
         self.element_is_visible(self.locators.SINGLE_COLOR_INPUT).send_keys(color)
         self.element_is_visible(self.locators.SINGLE_COLOR_INPUT).send_keys(Keys.ENTER)
         return color, self.element_is_visible(self.locators.SINGLE_INPUT_RESULT).text
+
+
+class DatePickerPage(BasePage):
+    locators = DatePickerPageLocators()
+
+    def set_date(self):
+        date = next(generated_date())
+        input_date = self.element_is_visible(self.locators.INPUT_DATE)
+        previous_date = input_date.get_attribute("value")
+        input_date.click()
+        self.set_item_by_text(self.locators.SELECT_MONTH, date.month)
+        self.set_item_by_text(self.locators.SELECT_YEAR, date.year)
+        self.set_item_from_date_list(self.locators.SELECT_DAY, str(int(date.day)))
+        result_date = input_date.get_attribute("value")
+        return previous_date, result_date
+
+    def set_time_date(self):
+        date = next(generated_date())
+        input_date = self.element_is_visible(self.locators.TIME_DATE_INPUT)
+        previous_date = input_date.get_attribute("value")
+        input_date.click()
+        self.element_is_visible(self.locators.TIME_DATE_MONTH_DROP).click()
+        self.set_item_from_date_list(self.locators.TIME_DATE_SELECT_MONTH, date.month)
+        self.element_is_visible(self.locators.TIME_DATE_YEAR_DROP).click()
+        self.set_year_for_time_date_picker(self.locators.TIME_DATE_SELECT_YEAR, date.year)
+        self.set_item_from_date_list(self.locators.SELECT_DAY, date.day)
+        self.set_item_from_date_list(self.locators.TIME_DATE_SELECT_TIME, date.time)
+        result_date = input_date.get_attribute("value")
+        return previous_date, result_date
+
+    def set_item_by_text(self, element, value):
+        select = Select(self.element_is_present(element))
+        select.select_by_visible_text(value)
+
+    def set_item_from_date_list(self, element, value):
+        items_list = self.elements_are_visible(element)
+        for item in items_list:
+            if item.text == value:
+                item.click()
+                break
+
+    def set_year_for_time_date_picker(self, element, value):
+        item_list = self.elements_are_visible(element)
+        while True:
+            item = item_list[1]
+            if item.text == value:
+                item.click()
+                break
+            else:
+                self.element_is_visible(self.locators.TIME_DATE_YEAR_SEARCH_OLD).click()
+                item_list = self.elements_are_visible(element)

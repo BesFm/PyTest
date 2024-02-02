@@ -39,3 +39,16 @@ class DatePickerPageLocators:
                                                   "--years react-datepicker__navigation--years-upcoming']")
     TIME_DATE_SELECT_YEAR = (By.CSS_SELECTOR, "div[class='react-datepicker__year-option']")
     TIME_DATE_SELECT_TIME = (By.CSS_SELECTOR, "li[class='react-datepicker__time-list-item ']")
+
+
+class SliderPageLocators:
+
+    INPUT_SLIDER = (By.CSS_SELECTOR, "input[class='range-slider range-slider--primary']")
+    SLIDER_VALUE = (By.CSS_SELECTOR, "input[id='sliderValue']")
+
+
+class ProgressBarPageLocators:
+
+    START_STOP_BUTTON = (By.CSS_SELECTOR, "button[id='startStopButton']")
+    PROGRESS_BAR = (By.CSS_SELECTOR, "div[class='progress-bar bg-info']")
+    RESET_BUTTON = (By.CSS_SELECTOR, "button[id='resetButton']")

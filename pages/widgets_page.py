@@ -1,11 +1,13 @@
 import random
+import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver import Keys
 from selenium.webdriver.support.select import Select
 
 from pages.base_page import BasePage
-from locators.widgets_page_locators import AccordianPageLocators, AutoCompletePageLocators, DatePickerPageLocators
+from locators.widgets_page_locators import (AccordianPageLocators, AutoCompletePageLocators, DatePickerPageLocators,
+                                            SliderPageLocators, ProgressBarPageLocators)
 from generator.generator import generated_colors, generated_date
 
 
@@ -118,3 +120,33 @@ class DatePickerPage(BasePage):
             else:
                 self.element_is_visible(self.locators.TIME_DATE_YEAR_SEARCH_OLD).click()
                 item_list = self.elements_are_visible(element)
+
+
+class SliderPage(BasePage):
+    locators = SliderPageLocators()
+
+    def change_slider_position(self):
+        slider_point = self.element_is_visible(self.locators.INPUT_SLIDER)
+        slider_value = self.element_is_visible(self.locators.SLIDER_VALUE)
+        previous_value = slider_value.get_attribute("value")
+        self.action_drag_and_drop_by_offset(slider_point, random.randint(0, 100), 0)
+        result_value = slider_value.get_attribute("value")
+        return previous_value, result_value, slider_point.get_attribute("value")
+
+
+class ProgressBarPage(BasePage):
+    locators = ProgressBarPageLocators()
+
+    def run_progress(self):
+        start_stop_button = self.element_is_visible(self.locators.START_STOP_BUTTON)
+        progress_bar = self.element_is_present(self.locators.PROGRESS_BAR)
+        previous_value = progress_bar.get_attribute("aria-valuenow")
+        start_stop_button.click()
+        time.sleep(2)
+        second_value = progress_bar.get_attribute("aria-valuenow")
+        time.sleep(2)
+        final_value = progress_bar.get_attribute("aria-valuenow")
+        time.sleep(6)
+        self.element_is_visible(self.locators.RESET_BUTTON).click()
+        reset_value = progress_bar.get_attribute("aria-valuenow")
+        return previous_value, second_value, final_value, reset_value

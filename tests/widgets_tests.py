@@ -1,5 +1,5 @@
 from conftest import driver
-from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage
+from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, SliderPage, ProgressBarPage
 import random
 
 
@@ -45,3 +45,22 @@ class TestWidgets:
             date_picker_page.open()
             input_date, output_date = date_picker_page.set_time_date()
             assert input_date != output_date, "Date hasn't changed"
+
+    class TestSlider:
+
+        def test_slider(self, driver):
+            slider_page = SliderPage(driver, "https://demoqa.com/slider")
+            slider_page.open()
+            previous_value, result_value, slider_own_value = slider_page.change_slider_position()
+            assert previous_value != result_value, "Slider hasn't change position"
+            assert result_value == slider_own_value, "Have difference between result value and slider value"
+
+    class TestProgressBar:
+
+        def test_progress_bar(self, driver):
+            progress_bar_page = ProgressBarPage(driver, "https://demoqa.com/progress-bar")
+            progress_bar_page.open()
+            first_value, second_value, final_value, reset_value = progress_bar_page.run_progress()
+            assert reset_value == first_value and reset_value == "0", ("Reset button didn't"
+                                                                       " work or progress isn't finished")
+            assert first_value < second_value < final_value, "Start/Stop button didn't work"

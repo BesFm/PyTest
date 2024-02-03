@@ -52,3 +52,24 @@ class ProgressBarPageLocators:
     START_STOP_BUTTON = (By.CSS_SELECTOR, "button[id='startStopButton']")
     PROGRESS_BAR = (By.CSS_SELECTOR, "div[class='progress-bar bg-info']")
     RESET_BUTTON = (By.CSS_SELECTOR, "button[id='resetButton']")
+
+
+class TabsPageLocators:
+
+    WHAT_TEXT = (By.CSS_SELECTOR, "div[id='demo-tabpane-what'] p")
+    WHAT_TAB = (By.CSS_SELECTOR, "a[id='demo-tab-what']")
+    ORIGIN_TEXT = (By.CSS_SELECTOR, "div[id='demo-tabpane-origin'] p")
+    ORIGIN_TAB = (By.CSS_SELECTOR, "a[id='demo-tab-origin']")
+    USE_TEXT = (By.CSS_SELECTOR, "div[id='demo-tabpane-use'] p")
+    USE_TAB = (By.CSS_SELECTOR, "a[id='demo-tab-use']")
+    MORE_TEXT = (By.CSS_SELECTOR, "div[id='demo-tabpane-more'] p")
+    MORE_TAB = (By.CSS_SELECTOR, "a[id='demo-tab-more']")
+
+
+class ToolTipsPageLocators:
+
+    BUTTON = (By.CSS_SELECTOR, "button[id='toolTipButton']")
+    TIP = (By.CSS_SELECTOR, "div[class='tooltip-inner']")
+    FIELD = (By.CSS_SELECTOR, "input[id='toolTipTextField']")
+    CONTRARY = (By.XPATH, "//a[contains(text(),'Contrary')]")
+    DATE = (By.XPATH, "//a[contains(text(),'1.10.32')]")

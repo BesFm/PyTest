@@ -1,13 +1,14 @@
 import random
 import time
 
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver import Keys
 from selenium.webdriver.support.select import Select
 
 from pages.base_page import BasePage
 from locators.widgets_page_locators import (AccordianPageLocators, AutoCompletePageLocators, DatePickerPageLocators,
-                                            SliderPageLocators, ProgressBarPageLocators)
+                                            SliderPageLocators, ProgressBarPageLocators, TabsPageLocators,
+                                            ToolTipsPageLocators)
 from generator.generator import generated_colors, generated_date
 
 
@@ -150,3 +151,50 @@ class ProgressBarPage(BasePage):
         self.element_is_visible(self.locators.RESET_BUTTON).click()
         reset_value = progress_bar.get_attribute("aria-valuenow")
         return previous_value, second_value, final_value, reset_value
+
+
+class TabsPage(BasePage):
+    locators = TabsPageLocators()
+
+    def get_tabs_texts(self):
+        tabs_locators_dictic = {0: self.locators.WHAT_TAB,
+                                1: self.locators.ORIGIN_TAB,
+                                2: self.locators.USE_TAB,
+                                3: self.locators.MORE_TAB}
+        text_locators_dictic = {0: self.locators.WHAT_TEXT,
+                                1: self.locators.ORIGIN_TEXT,
+                                2: self.locators.USE_TEXT,
+                                3: self.locators.MORE_TEXT}
+        tabs_texts = []
+        for i in range(4):
+            try:
+                tabs_texts.append(len(self.element_is_visible(text_locators_dictic[i]).text))
+            except TimeoutException:
+                try:
+                    self.element_is_visible(tabs_locators_dictic[i]).click()
+                    tabs_texts.append(len(self.element_is_visible(text_locators_dictic[i]).text))
+                except ElementClickInterceptedException or TimeoutException:
+                    print(f"!ASSERTION! Element {tabs_locators_dictic[i][1]} of Tabs Page isn't clickable or element"
+                          f" {text_locators_dictic[i][1]} of Tabs Page isn't visible")
+        return tabs_texts
+
+
+class ToolTipsPage(BasePage):
+    locators = ToolTipsPageLocators()
+
+    def get_text_from_tips(self):
+        dictic = {0: self.locators.BUTTON, 1: self.locators.FIELD, 2: self.locators.CONTRARY, 3: self.locators.DATE}
+        tip = self.locators.TIP
+        result_dictic = {}
+        for i in range(4):
+            try:
+                self.action_move_to(self.element_is_visible(dictic[i]))
+                time.sleep(0.5)
+                self.element_is_visible(tip)
+                key = self.element_is_visible(dictic[i]).get_attribute("aria-describedby")
+                value = self.element_is_visible(tip).text
+                result_dictic[key] = value
+            except TimeoutException:
+                print()
+                print(f"Error with {dictic[i][1]} element of Tool Tips Page")
+        return result_dictic

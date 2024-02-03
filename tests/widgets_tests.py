@@ -1,5 +1,6 @@
 from conftest import driver
-from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, SliderPage, ProgressBarPage
+from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, SliderPage, ProgressBarPage, TabsPage, \
+    ToolTipsPage
 import random
 
 
@@ -64,3 +65,23 @@ class TestWidgets:
             assert reset_value == first_value and reset_value == "0", ("Reset button didn't"
                                                                        " work or progress isn't finished")
             assert first_value < second_value < final_value, "Start/Stop button didn't work"
+
+    class TestTabsPage:
+
+        def test_tabs(self, driver):
+            tabs_page = TabsPage(driver, "https://demoqa.com/tabs")
+            tabs_page.open()
+            result_list = tabs_page.get_tabs_texts()
+            assert len(result_list) == 4, "Not all element's was added"
+            assert result_list[0] == 574, "WHAT_TAB text different for expected"
+            assert result_list[1] == 763, "ORIGIN_TAB text different for expected"
+            assert result_list[2] == 613, "USE_TAB text different for expected"
+            assert result_list[3] == 452, "MORE_TAB text different for expected"
+
+    class TestToolTipsPage:
+
+        def test_tool_tips(self, driver):
+            tool_tips_page = ToolTipsPage(driver, "https://demoqa.com/tool-tips")
+            tool_tips_page.open()
+            elements_dictic = tool_tips_page.get_text_from_tips()
+            assert len(elements_dictic) == 4, "Not all elements was added"

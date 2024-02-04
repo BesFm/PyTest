@@ -8,7 +8,7 @@ from selenium.webdriver.support.select import Select
 from pages.base_page import BasePage
 from locators.widgets_page_locators import (AccordianPageLocators, AutoCompletePageLocators, DatePickerPageLocators,
                                             SliderPageLocators, ProgressBarPageLocators, TabsPageLocators,
-                                            ToolTipsPageLocators)
+                                            ToolTipsPageLocators, MenuPageLocators, SelectMenuPageLocators)
 from generator.generator import generated_colors, generated_date
 
 
@@ -198,3 +198,70 @@ class ToolTipsPage(BasePage):
                 print()
                 print(f"Error with {dictic[i][1]} element of Tool Tips Page")
         return result_dictic
+
+
+class MenuPage(BasePage):
+    locators = MenuPageLocators()
+
+    def hover_all_menu_tabs(self):
+        elements_list = self.elements_are_present(self.locators.ALL_ELEMENTS)
+        result = []
+        for item in elements_list:
+            self.action_move_to(item)
+            result.append(item.text)
+        return result
+
+    def choose_menu_tab(self, tab):
+        dictic = {"Main Item 1": self.locators.MAIN_ITEM_1, "Main Item 2": self.locators.MAIN_ITEM_2,
+                  "Sub Item 1": self.locators.SUB_ITEM_1, "Sub Item 2": self.locators.SUB_ITEM_2,
+                  "SUB SUB LIST »": self.locators.SUB_LIST, "Sub Sub Item 1": self.locators.SUB_SUB_ITEM_1,
+                  "Sub Sub Item 2": self.locators.SUB_SUB_ITEM_2, "Main Item 3": self.locators.MAIN_ITEM_3}
+        if tab == "Main Item 1" or tab == "Main Item 2" or tab == "Main Item 3":
+            self.element_is_visible(dictic[tab]).click()
+        if tab == "Sub Item 1" or tab == "Sub Item 2" or tab == "SUB SUB LIST »":
+            self.action_move_to(self.element_is_visible(dictic["Main Item 2"]))
+            self.element_is_visible(dictic[tab]).click()
+        if tab == "Sub Sub Item 1" or tab == "Sub Sub Item 2":
+            self.action_move_to(self.element_is_visible(dictic["Main Item 2"]))
+            self.action_move_to(self.element_is_visible(dictic["SUB SUB LIST »"]))
+            self.element_is_visible(dictic[tab]).click()
+        tab_name = self.element_is_visible(dictic[tab]).text
+        return tab, tab_name
+
+
+class SelectMenuPage(BasePage):
+    locators = SelectMenuPageLocators()
+
+    def select_value(self):
+        self.element_is_visible(self.locators.SELECT_VALUE).click()
+        element = random.choice(self.elements_are_visible(self.locators.SELECT_VALUE_DROPDOWN))
+        element.click()
+
+    def select_title(self):
+        self.element_is_visible(self.locators.SELECT_TITLE).click()
+        element = random.choice(self.elements_are_visible(self.locators.SELECT_TITLE_DROPDOWN))
+        element.click()
+        return self.elements_are_visible(self.locators.GET_VALUE_TITLE)     # возвращаем значения полей value и title
+
+    def select_old_color(self):
+        self.element_is_visible(self.locators.SELECT_OLD_COLOR).click()
+        element = random.choice(self.elements_are_visible(self.locators.SELECT_OLD_COLOR_DROPDOWN))
+        element.click()
+
+    def select_colors(self):
+        self.element_is_visible(self.locators.SELECT_COLORS).click()
+        elements = self.elements_are_visible(self.locators.SELECT_COLORS_DROPDOWN)
+        time.sleep(1)
+        for element in elements:
+            self.go_to_element(element)
+            element.click()
+        for _ in range(2):
+            self.element_is_visible(self.locators.REMOVE_COLORS).click()
+            time.sleep(0.5)
+        self.element_is_present(self.locators.GET_COLOR_VALUE).click()
+        return self.element_is_visible(self.locators.GET_COLOR_VALUE).text
+
+    def select_old_car(self):           # плохой дропдаун
+        self.element_is_visible(self.locators.SELECT_OLD_CAR).click()
+        element = random.choice(self.elements_are_visible(self.locators.SELECT_OLD_CAR_DROPDOWN))
+        element.click()

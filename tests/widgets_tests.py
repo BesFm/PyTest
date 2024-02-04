@@ -1,6 +1,6 @@
 from conftest import driver
 from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, SliderPage, ProgressBarPage, TabsPage, \
-    ToolTipsPage
+    ToolTipsPage, MenuPage, SelectMenuPage
 import random
 
 
@@ -85,3 +85,27 @@ class TestWidgets:
             tool_tips_page.open()
             elements_dictic = tool_tips_page.get_text_from_tips()
             assert len(elements_dictic) == 4, "Not all elements was added"
+
+    class TestMenuPage:
+
+        def test_menu_page(self, driver):
+            menu_page = MenuPage(driver, "https://demoqa.com/menu#")
+            menu_page.open()
+            result = menu_page.hover_all_menu_tabs()
+            tab_name_chosen, tab_name_clicked = menu_page.choose_menu_tab("SUB SUB LIST »")
+            assert len(result) == 8, "Result list isn't full"
+            assert tab_name_chosen == tab_name_clicked, "Chosen another tab"
+
+    class TestSelectMenuPage:
+
+        def test_select_menu(self, driver):
+            select_menu_page = SelectMenuPage(driver, "https://demoqa.com/select-menu")
+            select_menu_page.open()
+            select_menu_page.select_value()
+            value, title = select_menu_page.select_title()
+            select_menu_page.select_old_color()
+            color = select_menu_page.select_colors()
+            select_menu_page.select_old_car()
+            assert value is not False, "Value isn't chosen"
+            assert title is not False, "Title isn't chosen"
+            assert color is not False, "Color isn't chosen"

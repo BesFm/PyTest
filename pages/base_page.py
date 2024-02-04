@@ -50,6 +50,11 @@ class BasePage:
         action.move_to_element(element)
         action.perform()
 
+    def action_drag_and_drop_to(self, source, target):
+        action = ActionChains(self.driver)
+        action.drag_and_drop(source, target)
+        action.perform()
+
     def action_drag_and_drop_by_offset(self, element, x_coards, y_coards):
         action = ActionChains(self.driver)
         action.drag_and_drop_by_offset(element, x_coards, y_coards)

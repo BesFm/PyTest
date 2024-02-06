@@ -1,9 +1,11 @@
 import random
 import time
+import re
+from selenium.common import MoveTargetOutOfBoundsException
 
 from pages.base_page import BasePage
 from locators.interactions_page_locators import (SortablePageLocators, SelectablePageLocators, ResizablePageLocators,
-                                                 DroppablePageLocators)
+                                                 DroppablePageLocators, DraggablePageLocators)
 
 
 def convert_sortable_list(elements_list):
@@ -63,15 +65,17 @@ class ResizablePage(BasePage):
         first_params = tuple(self.get_width_height_window(element))
         self.action_drag_and_drop_by_offset(self.element_is_present(dictic[window][1]),
                                             random.randint(1, 300), random.randint(1, 300))
+        time.sleep(0.5)
         second_params = tuple(self.get_width_height_window(element))
         self.action_drag_and_drop_by_offset(self.element_is_present(dictic[window][1]),
                                             random.randint(-300, -1), random.randint(-300, -1))
+        time.sleep(0.5)
         final_params = tuple(self.get_width_height_window(element))
         return first_params, second_params, final_params
 
     def get_width_height_window(self, element):
-        width, height = element.get_attribute("style").split("; ")
-        return int(width.split(":")[1].strip("px")), int(height.split(":")[1].strip("px;"))
+        width, height = re.findall(r"\d[0-9]\d", element.get_attribute("style"))
+        return int(width), int(height)
 
 
 class DroppablePage(BasePage):
@@ -127,3 +131,46 @@ class DroppablePage(BasePage):
             moving_assignment = moving_box.get_attribute("style") != "position: relative; left: 0px; top: 0px;"
         print(moving_box.get_attribute("style"))
         return result_target_text, moving_assignment
+
+
+class DraggablePage(BasePage):
+    locators = DraggablePageLocators()
+
+    def get_elements_position(self, element):
+        x_coord, y_coord = re.findall(r"\d[0-9]\d|\d[0-9]|\d", element.get_attribute("style"))
+        return int(x_coord[0]), int(y_coord[0])
+
+    def move_simple_element(self):
+        self.element_is_visible(self.locators.SIMPLE_TAB).click()
+        moving_element = self.element_is_visible(self.locators.SIMPLE_MOVING_ELEMENT)
+        previous_position = moving_element.get_attribute("style")
+        try:
+            self.action_drag_and_drop_by_offset(moving_element, random.randint(1, 300), random.randint(1, 300))
+            result_position_x, result_position_y = self.get_elements_position(moving_element)
+        except MoveTargetOutOfBoundsException:
+            return previous_position
+        return previous_position, result_position_x, result_position_y
+
+    def move_chosen_tab_element(self, tab="axis"):
+        tab_dictic = {"axis": self.locators.AXIS_RESTRICTED_TAB, "container": self.locators.CONTAINER_RESTRICTED_TAB}
+        elements_dictic = {"axis": [self.locators.X_MOVING_ELEMENT, self.locators.Y_MOVING_ELEMENT],
+                           "container": [self.locators.BOX_MOVING_TEXT, self.locators.PARENT_MOVING_TEXT]}
+        self.element_is_visible(tab_dictic[tab]).click()
+        self.remove_element()   # удаляем баннеры из-за перекрытия елемента
+        moving_element_1 = self.element_is_visible(elements_dictic[tab][0])
+        moving_element_2 = self.element_is_visible(elements_dictic[tab][1])
+        previous_position_1 = moving_element_1.get_attribute("style")
+        previous_position_2 = moving_element_2.get_attribute("style")
+        time.sleep(1)
+        try:    # изменяем положения элементов
+            self.action_drag_and_drop_by_offset(moving_element_1, random.randint(1, 600), random.randint(1, 400))
+            self.go_to_element(moving_element_2)
+            self.action_drag_and_drop_by_offset(moving_element_2, random.randint(1, 600), random.randint(1, 400))
+            result_position_x_1, result_position_y_1 = self.get_elements_position(moving_element_1)
+            result_position_x_2, result_position_y_2 = self.get_elements_position(moving_element_2)
+            time.sleep(0.5)    # даем время браузеру поменять атрибут style в дом-дереве
+        except MoveTargetOutOfBoundsException:
+            return None
+        return (previous_position_1, previous_position_2,
+                result_position_x_1, result_position_y_1, result_position_x_2, result_position_y_2)
+

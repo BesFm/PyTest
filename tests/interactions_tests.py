@@ -1,7 +1,5 @@
-import time
-
 from conftest import driver
-from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage
+from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage, DraggablePage
 
 
 class TestInteractions:
@@ -31,7 +29,7 @@ class TestInteractions:
         def test_resizable_page(self, driver):
             resizable_page = ResizablePage(driver, "https://demoqa.com/resizable")
             resizable_page.open()
-            resizable_page.remove_footer()
+            resizable_page.remove_element()
             box_sizes = resizable_page.resize_window("box window")
             simple_sizes = resizable_page.resize_window("simple window")
             assert box_sizes[0] != box_sizes[1] != box_sizes[2], "Box-window size isn't changed"
@@ -71,3 +69,40 @@ class TestInteractions:
             result_text, moving_assignment = droppable_page.move_revertable_box()
             assert result_text == "Dropped!", "Element isn't moved to target or target hasn't react"
             assert moving_assignment, "Element ISN'T MOVE back while it should or element MOVE back when it shouldn't"
+
+    class TestDraggablePage:
+        def test_simple_tab(self, driver):
+            draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
+            draggable_page.open()
+            previous_position, result_position_x, result_position_y = draggable_page.move_simple_element()
+            assert previous_position != result_position_x and result_position_x != 0, "Element hasn't been moved"
+            assert previous_position != result_position_y and result_position_y != 0, "Element hasn't been moved"
+
+        def test_axis_restricted_tab(self, driver):
+            draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
+            draggable_page.open()
+            elements_coords = draggable_page.move_chosen_tab_element("axis")
+            assert (elements_coords[0] != elements_coords[2] and
+                    elements_coords[0] != elements_coords[3]), "Element hasn't been moved"
+            # проверяем что x изменился, а y не изменился
+            assert elements_coords[2] != 0 and elements_coords[3] == 0, "Element has been moved through wrong axes"
+            assert (elements_coords[1] != elements_coords[4] and
+                    elements_coords[1] != elements_coords[5]), "Element hasn't been moved"
+            # проверяем что y изменился, а x не изменился
+            assert elements_coords[4] == 0 and elements_coords[5] != 0, "Element has been moved through wrong axes"
+
+
+        def test_container_restricted_tab(self, driver):
+            draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
+            draggable_page.open()
+            elements_coords = draggable_page.move_chosen_tab_element("container")
+            assert (elements_coords[0] != elements_coords[2] and
+                    elements_coords[0] != elements_coords[3]), "Element hasn't been moved"
+            # проверяем что елемент не вышел за границы допустимых координат
+            assert elements_coords[2] <= 655 and elements_coords[3] <= 106, "Element has been moved through border"
+            assert (elements_coords[1] != elements_coords[4] and
+                    elements_coords[1] != elements_coords[5]), "Element hasn't been moved"
+            # проверяем что елемент не вышел за границы допустимых координат
+            assert elements_coords[4] <= 13 and elements_coords[5] <= 86, "Element has been moved through border"
+
+

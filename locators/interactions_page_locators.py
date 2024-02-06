@@ -51,3 +51,20 @@ class DroppablePageLocators:
     REVERTABLE_MOVING_BOX = (By.CSS_SELECTOR, "div[id='revertable']")
     NONREVERTABLE_MOVING_BOX = (By.CSS_SELECTOR, "div[id='notRevertable']")
     REVERTABLE_TARGET_BOX = (By.CSS_SELECTOR, "div[id='revertableDropContainer'] div[id='droppable']")
+
+
+class DraggablePageLocators:
+
+    # Simple Tab
+    SIMPLE_TAB = (By.CSS_SELECTOR, "a[id='draggableExample-tab-simple']")
+    SIMPLE_MOVING_ELEMENT = (By.CSS_SELECTOR, "div[id='dragBox']")
+
+    # Axis Restricted Tab
+    AXIS_RESTRICTED_TAB = (By.CSS_SELECTOR, "a[id='draggableExample-tab-axisRestriction']")
+    X_MOVING_ELEMENT = (By.CSS_SELECTOR, "div[id='restrictedX']")
+    Y_MOVING_ELEMENT = (By.CSS_SELECTOR, "div[id='restrictedY']")
+
+    # Container Restricted Tab
+    CONTAINER_RESTRICTED_TAB = (By.CSS_SELECTOR, "a[id='draggableExample-tab-containerRestriction']")
+    BOX_MOVING_TEXT = (By.CSS_SELECTOR, "div[class='draggable ui-widget-content ui-draggable ui-draggable-handle']")
+    PARENT_MOVING_TEXT = (By.CSS_SELECTOR, "span[class='ui-widget-header ui-draggable ui-draggable-handle']")

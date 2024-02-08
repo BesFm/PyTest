@@ -1,5 +1,5 @@
 from selenium.webdriver import Keys
-from generator.generator import generated_person, generated_file, generated_subject, generated_state
+from generator.generator import generated_person, generated_file, generated_subject, generated_state, generated_date
 from locators.forms_page_locators import FormsPageLocators
 from pages.base_page import BasePage
 import random
@@ -32,15 +32,19 @@ class FormsPage(BasePage):
         return self.element_is_visible(self.locators.GENDER_RADIO[r]).text
 
     def set_birth_data(self):
+        date = next(generated_date())
         self.element_is_visible(self.locators.DATE_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_MONTH).click()
-        self.element_is_present(self.locators.MONTH_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_YEAR).click()
-        self.element_is_present(self.locators.YEAR_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_DAY).click()
-        months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-                  "November", "December"]
-        return self.locators.SP[2], months[int(self.locators.SP[1])], self.locators.SP[0]
+        self.set_date_by_text(self.locators.SELECT_MONTH, date.month)
+        self.set_date_by_text(self.locators.SELECT_YEAR, date.year)
+        self.set_date_by_text(self.locators.SELECT_DAY, str(int(date.day)))
+        return date.day, date.month, date.year
+
+    def set_date_by_text(self, element, value):     # установки даты
+        date_list = self.elements_are_visible(element)
+        for item in date_list:
+            if item.text == value:
+                item.click()
+                break
 
     def click_all_checkboxes(self):
         self.element_is_visible(self.locators.HOBBIES_CHECKBOX[0]).click()

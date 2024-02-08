@@ -48,7 +48,8 @@ def generated_state():
 
 
 def generated_colors():
-    return ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White", "Voilet", "Indigo", "Magenta", "Aqua"]
+    yield random.sample(["Red", "Blue", "Green", "Yellow", "Purple", "Black",
+                         "White", "Voilet", "Indigo", "Magenta", "Aqua"], 3)
 
 
 def generated_date():

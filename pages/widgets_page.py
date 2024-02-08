@@ -41,7 +41,7 @@ class AutoCompletePage(BasePage):
     locators = AutoCompletePageLocators()
 
     def fill_multiple_color_input(self):
-        color = random.sample(generated_colors(), 3)
+        color = next(generated_colors())
         result = []
         mult_input_button = self.element_is_visible(self.locators.MULTIPLE_COLOR_INPUT)
         for i in range(3):
@@ -66,10 +66,11 @@ class AutoCompletePage(BasePage):
             return None
 
     def fill_single_color_input(self):
-        color = random.choice(generated_colors())
+        color = random.choice(next(generated_colors()))
         self.element_is_visible(self.locators.SINGLE_COLOR_INPUT).send_keys(color)
         self.element_is_visible(self.locators.SINGLE_COLOR_INPUT).send_keys(Keys.ENTER)
         return color, self.element_is_visible(self.locators.SINGLE_INPUT_RESULT).text
+
 
 
 class DatePickerPage(BasePage):

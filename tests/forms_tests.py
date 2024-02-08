@@ -1,3 +1,5 @@
+import time
+
 from pages.forms_page import FormsPage
 from conftest import driver
 import os

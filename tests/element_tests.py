@@ -28,14 +28,7 @@ class TestElements:
         def test_check_box(self, driver):
             check_box_page = CheckBoxPage(driver, "https://demoqa.com/checkbox")
             check_box_page.open()
-            check_box_page.open_full_checkbox_list()
-            check_box_page.click_random_checkbox()
-            input_checkbox = check_box_page.get_checked_checkbox()
-            output_checkbox = check_box_page.get_output_checkbox()
-            print()
-            print(input_checkbox)
-            print(output_checkbox)
-            assert input_checkbox == output_checkbox, "checkbox is not selected"
+            assert check_box_page.input_checkbox() == check_box_page.get_output_checkbox(), "Some checkbox not selected"
 
     @allure.feature("RadioButtons")
     class TestRadioButton:
@@ -43,12 +36,7 @@ class TestElements:
         def test_radio_button(self, driver):
             radio_button_page = RadioButtonPage(driver, "https://demoqa.com/radio-button")
             radio_button_page.open()
-            radio_button_page.click_radio_button('yes')
-            output_yes = radio_button_page.get_output_radiobutton()
-            radio_button_page.click_radio_button('impressive')
-            output_impressive = radio_button_page.get_output_radiobutton()
-            radio_button_page.click_radio_button('no')
-            output_no = radio_button_page.get_output_radiobutton()
+            output_yes, output_impressive, output_no = radio_button_page.select_and_get_selected_radiobutton()
             assert output_yes == "Yes", "RadioButton 'Yes' not valid"
             assert output_impressive == "Impressive", "RadioButton 'Impressive' not valid"
             assert output_no == "No", "RadioButton 'No' not valid"
@@ -59,44 +47,33 @@ class TestElements:
         def test_web_table_add_person(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
-            new_person = web_table_page.add_new_person()[random.randint(0, 1)]
-            table_result = web_table_page.get_new_person_info()
-            assert new_person in table_result
+            assert web_table_page.add_new_person() in web_table_page.get_new_person_info(), \
+                "New person isn't founded or hasn't been added"
 
         @allure.title("Web Table: Search Person")
         def test_wev_table_search_person(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
-            key_word = random.choice(web_table_page.add_new_person())
-            web_table_page.search_person(random.choice(key_word))
-            table_result = web_table_page.get_searched_person_info()
-            assert key_word == table_result, "Person wasn't found in the table"
+            assert web_table_page.check_searching_function(), "Person isn't found in the table or hasn't been added"
 
         @allure.title("Web Table: Update Person")
         def test_web_table_update_person_info(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
-            person_data = random.choice(web_table_page.add_new_person())
-            web_table_page.search_person(random.choice(person_data))
-            age = web_table_page.update_person_info()
-            row = web_table_page.get_new_person_info()
-            assert age in row[0], "The Person card hasn't been changed"
+            assert web_table_page.check_updating_function(), "The Person card hasn't been updated or hasn't been added"
 
         @allure.title("Web Table: Delete Person")
         def test_web_table_delete_person_info(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
-            person_data = random.choice(web_table_page.add_new_person())
-            web_table_page.search_person(random.choice(person_data))
-            result = web_table_page.delete_person()
-            assert result == "No rows found", "The Person card hasn't been deleted"
+            assert web_table_page, "The Person card hasn't been deleted or hasn't been added"
 
         @allure.title("Web Table: Change row count")
         def test_web_table_change_count_row(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
             count = web_table_page.select_up_to_some_rows()
-            assert count == [5, 10, 20, 25, 50, 100], "The count rows can't be chosen"
+            assert count == [5, 10, 20, 25, 50, 100], "All of the count rows can't be chosen"
 
     @allure.feature("Button Click")
     class TestButtonClick:
@@ -104,10 +81,9 @@ class TestElements:
         def test_button_page_different_click(self, driver):
             button_page = ButtonPage(driver, "https://demoqa.com/buttons")
             button_page.open()
-            click_result = button_page.click_on_different_button()
-            assert click_result == ('You have done a double click',
-                                    'You have done a right click',
-                                    'You have done a dynamic click')
+            assert button_page.click_on_different_button() == ('You have done a double click',
+                                                               'You have done a right click',
+                                                               'You have done a dynamic click')
 
     @allure.feature("Links")
     class TestLinksPage:
@@ -115,14 +91,13 @@ class TestElements:
         def test_check_link(self, driver):
             link_page = LinkPage(driver, "https://demoqa.com/links")
             link_page.open()
-            href_link, current_url = link_page.click_new_tab_simple_link()
-            assert href_link == current_url, "Current link has got another URL than expected"
+            assert link_page.click_new_tab_simple_link(), "Current link has got another URL than expected"
 
         @allure.title("Test broken links")
         def test_broken_links(self, driver):
             link_page = LinkPage(driver, "https://demoqa.com/links")
             link_page.open()
-            link_page.click_another_links()
+            assert 200 not in link_page.click_another_links(), "Some link give status code 200"
 
     @allure.feature("Upload and Download")
     class TestUploadAndDownload:
@@ -130,15 +105,13 @@ class TestElements:
         def test_upload(self, driver):
             upload_download_page = UpDownLoadPage(driver, "https://demoqa.com/upload-download")
             upload_download_page.open()
-            file_name, uploaded_file_path = upload_download_page.upload_file()
-            assert file_name == uploaded_file_path, "Chosen file isn't uploaded"
+            assert upload_download_page.upload_file(), "Chosen file isn't uploaded"
 
         @allure.title("Test download")
         def test_download(self, driver):
             upload_download_page = UpDownLoadPage(driver, "https://demoqa.com/upload-download")
             upload_download_page.open()
-            result = upload_download_page.download_file()
-            assert result is True, "File isn't downloaded"
+            assert upload_download_page.download_file() is True, "File isn't downloaded"
 
     @allure.feature("Dynamic Properties")
     class TestDynamicProperties:

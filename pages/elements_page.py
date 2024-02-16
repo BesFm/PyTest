@@ -76,6 +76,12 @@ class CheckBoxPage(BasePage):
             data.append(item.text.lower())
         return data
 
+    @allure.step("Input and Get selected checkboxes")
+    def input_checkbox(self):
+        self.open_full_checkbox_list()
+        self.click_random_checkbox()
+        return self.get_checked_checkbox()
+
 
 class RadioButtonPage(BasePage):
     locators = RadioButtonPageLocators()
@@ -91,6 +97,16 @@ class RadioButtonPage(BasePage):
     @allure.step("Get output radiobutton")
     def get_output_radiobutton(self):
         return self.element_is_present(self.locators.CHOSEN_RADIO).text
+
+    @allure.step("Select and Get selected radiobutton")
+    def select_and_get_selected_radiobutton(self):
+        self.click_radio_button('yes')
+        output_yes = self.get_output_radiobutton()
+        self.click_radio_button('impressive')
+        output_impressive = self.get_output_radiobutton()
+        self.click_radio_button('no')
+        output_no = self.get_output_radiobutton()
+        return output_yes, output_impressive, output_no
 
 
 class WebTablePage(BasePage):
@@ -119,7 +135,7 @@ class WebTablePage(BasePage):
                 self.element_is_visible(self.locators.SUBMIT).click()
             count -= 1
             person_list.append([firstname, lastname, str(age), email, str(salary), department])
-        return person_list
+        return random.choice(person_list)
 
     @allure.step("Get person info")
     def get_new_person_info(self):
@@ -133,12 +149,6 @@ class WebTablePage(BasePage):
     @allure.step("Search person by keyword")
     def search_person(self, key_words):
         self.element_is_visible(self.locators.SEARCH_FIELD).send_keys(key_words)
-
-    @allure.step("Get searched person info")
-    def get_searched_person_info(self):
-        delete_button = self.element_is_present(self.locators.DELETE_BUTTON)
-        row = delete_button.find_element("xpath", self.locators.ROW_PARENT)
-        return row.text.splitlines()
 
     @allure.step("Update person info")
     def update_person_info(self):
@@ -173,6 +183,30 @@ class WebTablePage(BasePage):
         list_rows = self.elements_are_present(self.locators.PERSON_INFO)
         return len(list_rows)
 
+    @allure.step("Check searching function")
+    def check_searching_function(self):
+        added_person_info = self.add_new_person()  # Add person
+        keywords = random.choice(added_person_info)  # Take keywords from new person info list
+        self.search_person(key_words=keywords)  # Input keywords and Searching
+        searched_person_info = self.element_is_visible(self.locators.PERSON_INFO).text  # Get searched person info
+        return added_person_info == searched_person_info.splitlines()  # Check equal of info
+
+    @allure.step("Check updating function")
+    def check_updating_function(self):
+        added_person_info = self.add_new_person()  # Add person
+        keywords = random.choice(added_person_info)  # Take keywords from new person info list
+        self.search_person(key_words=keywords)  # Input keywords and Searching
+        updated_age = self.update_person_info()  # Updating person age
+        return updated_age not in added_person_info  # Check non equal info
+
+    @allure.step("Check deleting function")
+    def check_deleting_function(self):
+        added_person_info = self.add_new_person()  # Add person
+        keywords = random.choice(added_person_info)  # Take keywords from new person info list
+        self.search_person(key_words=keywords)  # Input keywords and Searching
+        result_text = self.delete_person()  # Deleting person
+        return result_text == "No rows found"  # Check equal text
+
 
 class ButtonPage(BasePage):
     locators = ButtonsPageLocators()
@@ -203,25 +237,27 @@ class LinkPage(BasePage):
             simple_link.click()
             self.driver.switch_to.window(self.driver.window_handles[1])
             url = self.driver.current_url
-            return link_href, url
+            return link_href == url
         else:
             return f'Status code is {request.status_code}', link_href
 
     @allure.step("Click non-working links")
     def click_another_links(self):
+        status_list = []
         simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
-        link_href = simple_link.get_attribute("href")  # берет атрибут "href" элемента из дом-дерева
-        links_list = ["created", "no-content", "moved", "bad-request", "unauthorized", "forbidden", "invalid-url"]
-        links_locators_list = [self.locators.CREATED_LINK, self.locators.NO_CONTENT_LINK, self.locators.MOVED_LINK,
-                               self.locators.BED_REQUEST_LINK, self.locators.UNAUTHORIZED_LINK,
-                               self.locators.FORBIDDEN_LINK, self.locators.NOT_FOUND_LINK]
-        for i in range(len(links_list)):
-            request = requests.get(f"{link_href}{links_list[i]}")
+        link_href = simple_link.get_attribute("href")
+        links_dictic = {"created": self.locators.CREATED_LINK, "no-content": self.locators.NO_CONTENT_LINK,
+                        "moved": self.locators.MOVED_LINK, "bad-request": self.locators.BED_REQUEST_LINK,
+                        "unauthorized": self.locators.UNAUTHORIZED_LINK, "forbidden": self.locators.FORBIDDEN_LINK,
+                        "invalid-url": self.locators.NOT_FOUND_LINK}
+        for handle, element in links_dictic.items():
+            request = requests.get(f"{link_href}{handle}")
             if request.status_code == 200:
-                simple_link.click()
-                self.element_is_present(links_locators_list[i]).click()
+                self.element_is_present(element).click()
+                status_list.append(request.status_code)
             else:
-                print(f'Status code is {request.status_code}, {self.element_is_present(links_locators_list[i]).text}')
+                status_list.append(request.status_code)
+        return status_list
 
 
 class UpDownLoadPage(BasePage):
@@ -234,7 +270,7 @@ class UpDownLoadPage(BasePage):
         uploaded_file_path = self.element_is_present(self.locators.UPLOAD_FILE_PATH).text
         time.sleep(3)
         os.remove(path)
-        return path.split("\\")[-1], uploaded_file_path.split("\\")[-1]
+        return path.split("\\")[-1] == uploaded_file_path.split("\\")[-1]
 
     @allure.step("Download file")
     def download_file(self):
@@ -261,14 +297,13 @@ class DynamicPropertiesPage(BasePage):
             time.sleep(5)
             color_button_after = color_button.value_of_css_property("color")
             color_changed = color_button_before != color_button_after
+        not_av_button_enable, not_vis_button_enable = True, True
         with allure.step("Not Available Button"):
-            not_av_button_enable = True
             try:
                 self.element_is_clickable(self.locators.ENABLE_IN_BUTTON)
             except TimeoutException:
                 not_av_button_enable = False
         with allure.step("Not Visible Button"):
-            not_vis_button_enable = True
             try:
                 self.element_is_visible(self.locators.VISIBLE_IN_BUTTON)
             except TimeoutException:

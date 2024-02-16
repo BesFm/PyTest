@@ -54,7 +54,7 @@ class WebTablePageLocators:
 
     # Поиск
     SEARCH_FIELD = (By.CSS_SELECTOR, "div input[id='searchBox']")
-    DELETE_BUTTON = (By.CSS_SELECTOR, "span[title='Delete'")
+    DELETE_BUTTON = (By.CSS_SELECTOR, "span[title='Delete']")
     ROW_PARENT = ".//ancestor::div[@class='rt-tr -odd']"
 
     # Обновление данных

@@ -1,6 +1,8 @@
 import random
 import time
 
+import allure
+
 from pages.base_page import BasePage
 from locators.a_f_w_page_locators import (BrowserWindowsPageLocators, AlertsPageLocators, FramePageLocators,
                                           NestedFramesLocators, ModalPageLocators)
@@ -10,6 +12,7 @@ from generator.generator import generated_person
 class BrowserWindowsPage(BasePage):
     locators = BrowserWindowsPageLocators()
 
+    @allure.step("Open New Tab or New Window Button")
     def open_tab_or_window(self, button):
         dictic = {"new_tab": self.locators.NEW_TAB_BUTTON, "new_window": self.locators.NEW_WINDOW_BUTTON}
         self.element_is_visible(dictic[button]).click()
@@ -21,6 +24,7 @@ class BrowserWindowsPage(BasePage):
 class AlertsPage(BasePage):
     locators = AlertsPageLocators()
 
+    @allure.step("Call simple or time alert")
     def call_simple_time_alert(self, button):
         dictic = {"simple": [self.locators.SIMPLE_ALERT_BUTTON, 0], "time": [self.locators.TIME_ALERT_BUTTON, 5]}
         self.element_is_visible(dictic[button][0]).click()
@@ -28,18 +32,21 @@ class AlertsPage(BasePage):
         alert_window = self.driver.switch_to.alert
         return alert_window.text
 
+    @allure.step("Call Confirm alert")
     def call_confirm_alert(self):
         self.element_is_visible(self.locators.CONFIRM_ALERT_BUTTON).click()
         alert_window = self.driver.switch_to.alert
         var = ["accept", "dismiss"]
-        choice = random.choice(var)
-        if choice == "accept":
-            alert_window.accept()
-        elif choice == "dismiss":
-            alert_window.dismiss()
-        dictic = {var[0]: "You selected Ok", var[1]: "You selected Cancel"}
+        with allure.step("Confirm or dismiss alert"):
+            choice = random.choice(var)
+            if choice == "accept":
+                alert_window.accept()
+            elif choice == "dismiss":
+                alert_window.dismiss()
+            dictic = {var[0]: "You selected Ok", var[1]: "You selected Cancel"}
         return dictic[choice], self.element_is_visible(self.locators.CONFIRM_RESULT).text
 
+    @allure.step("Call Prompt alert")
     def call_prompt_alert(self):
         fullname = next(generated_person()).full_name
         self.element_is_visible(self.locators.PROMPT_ALERT_BUTTON).click()
@@ -52,6 +59,7 @@ class AlertsPage(BasePage):
 class FramesPage(BasePage):
     locators = FramePageLocators()
 
+    @allure.step("Read Frame content")
     def get_frame_content(self, frame_num):
         dictic = {"frame1": self.locators.FIRST_FRAME, "frame2": self.locators.SECOND_FRAME}
         frame = self.element_is_visible(dictic[frame_num])
@@ -66,6 +74,7 @@ class FramesPage(BasePage):
 class NestedFramesPage(BasePage):
     locators = NestedFramesLocators()
 
+    @allure.step("Read Nested Frames content")
     def get_nested_frames_content(self):
         lframe = self.element_is_visible(self.locators.LARGE_FRAME)
         self.driver.switch_to.frame(lframe)
@@ -79,12 +88,14 @@ class NestedFramesPage(BasePage):
 class ModalDialogsPage(BasePage):
     locators = ModalPageLocators()
 
+    @allure.step("Open Small Modal")
     def call_small_modal(self):
         self.element_is_visible(self.locators.OPEN_SMALL_MODAL).click()
         small_modal_header = self.element_is_visible(self.locators.MODAL_HEADER).text
         self.element_is_visible(self.locators.CLOSE_SMALL_MODAL).click()
         return small_modal_header
 
+    @allure.step("Open Large Modal")
     def call_large_modal(self):
         self.element_is_visible(self.locators.OPEN_LARGE_MODAL).click()
         large_modal_header = self.element_is_visible(self.locators.MODAL_HEADER).text

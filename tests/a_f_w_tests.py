@@ -1,50 +1,63 @@
+import allure
+
 from conftest import driver
 from pages.a_f_w_page import BrowserWindowsPage, AlertsPage, FramesPage, NestedFramesPage, ModalDialogsPage
 
 
+@allure.suite("Test Alerts, Frame and Windows")
 class TestAlertsFrameWindows:
 
+    @allure.feature("Test Browser Windows")
     class TestBrowserWindows:
+        @allure.title("Test New Tab button")
         def test_new_tab(self, driver):
             browser_windows_page = BrowserWindowsPage(driver, "https://demoqa.com/browser-windows")
             browser_windows_page.open()
             new_tab_title = browser_windows_page.open_tab_or_window("new_tab")
             assert new_tab_title == "This is a sample page", "Tab isn't opened"
 
+        @allure.title("Test New Window button")
         def test_new_window(self, driver):
             browser_windows_page = BrowserWindowsPage(driver, "https://demoqa.com/browser-windows")
             browser_windows_page.open()
             new_window_title = browser_windows_page.open_tab_or_window("new_window")
             assert new_window_title == "This is a sample page", "Tab isn't opened"
 
+    @allure.feature("Test Alerts")
     class TestAlerts:
 
+        @allure.title("Test Simple alert button")
         def test_simple_alert_button(self, driver):
             alerts_page = AlertsPage(driver, "https://demoqa.com/alerts")
             alerts_page.open()
             alert_text = alerts_page.call_simple_time_alert("simple")
             assert alert_text == "You clicked a button", "Alert isn't appear"
 
+        @allure.title("Test Time alert button")
         def test_time_alert_button(self, driver):
             alerts_page = AlertsPage(driver, "https://demoqa.com/alerts")
             alerts_page.open()
             alert_text = alerts_page.call_simple_time_alert("time")
             assert alert_text == "This alert appeared after 5 seconds", "Alert isn't appear"
 
+        @allure.title("Test Confirm alert button")
         def test_confirm_alert_button(self, driver):
             alerts_page = AlertsPage(driver, "https://demoqa.com/alerts")
             alerts_page.open()
             exp, fact = alerts_page.call_confirm_alert()
             assert exp == fact, "Something wrong with alert"
 
+        @allure.title("Test Prompt alert button")
         def test_prompt_alert_button(self, driver):
             alerts_page = AlertsPage(driver, "https://demoqa.com/alerts")
             alerts_page.open()
             exp, fact = alerts_page.call_prompt_alert()
             assert exp == fact, "Something wrong with alert"
 
+    @allure.feature("Test Frames")
     class TestFrames:
 
+        @allure.title("Check Frames content")
         def test_frames(self, driver):
             frames_page = FramesPage(driver, "https://demoqa.com/frames")
             frames_page.open()
@@ -55,8 +68,10 @@ class TestAlertsFrameWindows:
             assert ftext1 == "This is a sample page", "Frame's content differs from expected"
             assert ftext2 == "This is a sample page", "Frame's content differs from expected"
 
+    @allure.feature("Test Nested Frames")
     class TestNestedFrames:
 
+        @allure.title("Check Nested Frames content")
         def test_nested_frames(self, driver):
             nestframes_page = NestedFramesPage(driver, "https://demoqa.com/nestedframes")
             nestframes_page.open()
@@ -64,8 +79,10 @@ class TestAlertsFrameWindows:
             assert lframe_text == "Parent frame", "Frame's content differs from expected"
             assert sframe_text == "Child Iframe", "Frame's content differs from expected"
 
+    @allure.feature("Test Modal Dialogs")
     class TestModalDialogs:
 
+        @allure.title("Check Modal Dialogs content")
         def test_modal_dialogs(self, driver):
             modal_dialogs_page = ModalDialogsPage(driver, "https://demoqa.com/modal-dialogs")
             modal_dialogs_page.open()

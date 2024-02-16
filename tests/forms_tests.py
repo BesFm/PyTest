@@ -1,12 +1,15 @@
 import time
 
+import allure
+
 from pages.forms_page import FormsPage
 from conftest import driver
 import os
 
 
+@allure.suite("TestForms")
 class TestForms:
-
+    @allure.title("Test all from")
     def test_all_form(self, driver):
         forms_page = FormsPage(driver, "https://demoqa.com/automation-practice-form")
         forms_page.open()
@@ -23,4 +26,3 @@ class TestForms:
                       subjects, hobbies, filename.split("\\")[-1], address, state_city]
         output_info = forms_page.get_output_info()
         assert input_info == output_info, "Invalid info"
-

@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from enum import Enum
+
 
 @dataclass
 class Person:
@@ -14,3 +16,15 @@ class Person:
     mobile_number: int = None
     birth_date: list = None
     subject: str = None
+
+
+@dataclass
+class Date:
+    year: str = None
+    month: str = None
+    day: str = None
+    time: str = None
+
+
+class Answers(Enum):
+    YES = "YES"

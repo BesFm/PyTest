@@ -1,9 +1,10 @@
 import random
-
-from Data.data import Person
+import time
+from Data.data import Person, Date
 from faker import Faker
 
 faker_ru = Faker("ru_RU")
+faker_en = Faker("En")
 Faker.seed()
 
 
@@ -44,3 +45,17 @@ def generated_state():
     state_city_list = {"NCR": ["Delhi", "Gurgaon", "Noida"], "Uttar Pradesh": ["Agra", "Lucknow", "Merrut"],
                        "Haryana": ["Karnal", "Panipat"], "Rajasthan": ["Jaipur", "Jaiselmer"]}
     return state, random.choice(state_city_list[state])
+
+
+def generated_colors():
+    yield random.sample(["Red", "Blue", "Green", "Yellow", "Purple", "Black",
+                         "White", "Voilet", "Indigo", "Magenta", "Aqua"], 3)
+
+
+def generated_date():
+    yield Date(
+        year=faker_en.year(),
+        month=faker_en.month_name(),
+        day=faker_en.day_of_month(),
+        time=time.strftime("%H:", time.localtime()) + str(random.randrange(0, 45, 15))
+    )

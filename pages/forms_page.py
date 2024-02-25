@@ -1,5 +1,9 @@
+import os
+from typing import Any, LiteralString
+
+import allure
 from selenium.webdriver import Keys
-from generator.generator import generated_person, generated_file, generated_subject, generated_state
+from generator.generator import generated_person, generated_file, generated_subject, generated_state, generated_date
 from locators.forms_page_locators import FormsPageLocators
 from pages.base_page import BasePage
 import random
@@ -12,37 +16,46 @@ class FormsPage(BasePage):
     def remove_banners(self):
         self.remove_element()
 
-    def fill_inputs(self):
+    @allure.step("Fill inputs")
+    def fill_inputs(self) -> tuple[Any, Any, Any, Any, LiteralString | str, Any]:
         person_info = next(generated_person())
         subjects = generated_subject()
-        self.element_is_visible(self.locators.INPUT_FIRSTNAME).send_keys(person_info.firstname)
-        self.element_is_visible(self.locators.INPUT_LASTNAME).send_keys(person_info.lastname)
-        self.element_is_visible(self.locators.INPUT_EMAIL).send_keys(person_info.email)
-        self.element_is_visible(self.locators.MOBILE_NUMBER).send_keys(person_info.mobile_number)
-        for i in subjects:
-            self.element_is_visible(self.locators.INPUT_SUBJECTS).send_keys(i)
-            self.element_is_visible(self.locators.INPUT_SUBJECTS).send_keys(Keys.RETURN)
-        self.element_is_visible(self.locators.INPUT_ADDRESS).send_keys(person_info.current_Address)
+        with allure.step("Filling inputs"):
+            self.element_is_visible(self.locators.INPUT_FIRSTNAME).send_keys(person_info.firstname)
+            self.element_is_visible(self.locators.INPUT_LASTNAME).send_keys(person_info.lastname)
+            self.element_is_visible(self.locators.INPUT_EMAIL).send_keys(person_info.email)
+            self.element_is_visible(self.locators.MOBILE_NUMBER).send_keys(person_info.mobile_number)
+            for i in subjects:
+                self.element_is_visible(self.locators.INPUT_SUBJECTS).send_keys(i)
+                self.element_is_visible(self.locators.INPUT_SUBJECTS).send_keys(Keys.RETURN)
+            self.element_is_visible(self.locators.INPUT_ADDRESS).send_keys(person_info.current_Address)
         return (person_info.firstname, person_info.lastname, person_info.email, person_info.mobile_number,
                 ", ".join(subjects), person_info.current_Address)
 
-    def click_radio_butt(self):
+    @allure.step("Set gender")
+    def click_radio_butt(self) -> str:
         r = random.randint(0, 2)
         self.element_is_visible(self.locators.GENDER_RADIO[r]).click()
         return self.element_is_visible(self.locators.GENDER_RADIO[r]).text
 
-    def set_birth_data(self):
+    @allure.step("Set date of birth")
+    def set_birth_date(self) -> tuple[Any, Any, Any]:
+        date = next(generated_date())
         self.element_is_visible(self.locators.DATE_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_MONTH).click()
-        self.element_is_present(self.locators.MONTH_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_YEAR).click()
-        self.element_is_present(self.locators.YEAR_OF_BIRTH).click()
-        self.element_is_visible(self.locators.SELECT_DAY).click()
-        months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-                  "November", "December"]
-        return self.locators.SP[2], months[int(self.locators.SP[1])], self.locators.SP[0]
+        self.set_date_by_text(self.locators.SELECT_MONTH, date.month)
+        self.set_date_by_text(self.locators.SELECT_YEAR, date.year)
+        self.set_date_by_text(self.locators.SELECT_DAY, str(int(date.day)))
+        return date.day, date.month, date.year
 
-    def click_all_checkboxes(self):
+    def set_date_by_text(self, element, value):  # установки даты
+        date_list = self.elements_are_visible(element)
+        for item in date_list:
+            if item.text == value:
+                item.click()
+                break
+
+    @allure.step("Set all hobbies")
+    def click_all_checkboxes(self) -> str:
         self.element_is_visible(self.locators.HOBBIES_CHECKBOX[0]).click()
         self.element_is_visible(self.locators.HOBBIES_CHECKBOX[1]).click()
         self.element_is_visible(self.locators.HOBBIES_CHECKBOX[2]).click()
@@ -50,12 +63,14 @@ class FormsPage(BasePage):
                 f" {self.element_is_visible(self.locators.HOBBIES_CHECKBOX[1]).text},"
                 f" {self.element_is_visible(self.locators.HOBBIES_CHECKBOX[2]).text}")
 
-    def upload_file(self):
+    @allure.step("Upload file")
+    def upload_file(self) -> str:
         path = generated_file()
         self.element_is_visible(self.locators.UPLOAD_PICTURE).send_keys(path)
         return path
 
-    def set_state_city(self):
+    @allure.step("Set state and city")
+    def set_state_city(self) -> str:
         state, city = generated_state()
         self.go_to_element(self.element_is_present(self.locators.SELECT_STATE))
         self.element_is_visible(self.locators.INPUT_STATE).send_keys(state)
@@ -64,13 +79,28 @@ class FormsPage(BasePage):
         self.element_is_visible(self.locators.INPUT_CITY).send_keys(Keys.RETURN)
         return f"{state} {city}"
 
+    @allure.step("Send filled form")
     def click_submit_butt(self):
         self.element_is_visible(self.locators.SUBMIT_BUTTON).click()
 
-    def get_output_info(self):
+    @allure.step("Get output form")
+    def get_output_info(self) -> list[str]:
         student_info = self.elements_are_visible(self.locators.OUTPUT_INFO)
         data = []
-        for i in student_info:
-            data.append(i.text)
+        for row in student_info:
+            data.append(row.text)
         self.element_is_visible(self.locators.CLOSE_TABLE).click()
         return data
+
+    @allure.step("Filling and sending all info")
+    def send_input_info(self) -> list[str]:
+        firstname, lastname, email, mobile, subjects, address = self.fill_inputs()
+        gender = self.click_radio_butt()
+        day, month, year = self.set_birth_date()
+        hobbies = self.click_all_checkboxes()
+        filename = self.upload_file()
+        state_city = self.set_state_city()
+        self.click_submit_butt()
+        os.remove(filename)
+        return [f"{firstname} {lastname}", email, gender, str(mobile), f"{day} {month},{year}",
+                subjects, hobbies, filename.split("\\")[-1], address, state_city]

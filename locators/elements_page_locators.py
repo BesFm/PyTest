@@ -54,7 +54,7 @@ class WebTablePageLocators:
 
     # Поиск
     SEARCH_FIELD = (By.CSS_SELECTOR, "div input[id='searchBox']")
-    DELETE_BUTTON = (By.CSS_SELECTOR, "span[title='Delete'")
+    DELETE_BUTTON = (By.CSS_SELECTOR, "span[title='Delete']")
     ROW_PARENT = ".//ancestor::div[@class='rt-tr -odd']"
 
     # Обновление данных
@@ -87,6 +87,7 @@ class LinksPageLocators:
     UNAUTHORIZED_LINK = (By.CSS_SELECTOR, "a[id='unauthorized']")
     FORBIDDEN_LINK = (By.CSS_SELECTOR, "a[id='forbidden']")
     NOT_FOUND_LINK = (By.CSS_SELECTOR, "a[id='invalid-url']")
+    LINKS_RESULT_TITLE = (By.CSS_SELECTOR, "div[id='linkWrapper'] p[id='linkResponse']")
 
 
 class UpDownLoadPageLocators:

@@ -13,13 +13,9 @@ class FormsPageLocators:
                     (By.CSS_SELECTOR, "label[for='gender-radio-3']"))
     MOBILE_NUMBER = (By.CSS_SELECTOR, "input[id='userNumber']")
     DATE_OF_BIRTH = (By.CSS_SELECTOR, "input[id='dateOfBirthInput']")
-    SELECT_MONTH = (By.CSS_SELECTOR, "select[class='react-datepicker__month-select']")
-    SP = next(generated_person()).birth_date
-    MONTH_OF_BIRTH = (By.CSS_SELECTOR, f"option[value='{int(SP[1])}']")
-    SELECT_YEAR = (By.CSS_SELECTOR, "select[class='react-datepicker__year-select']")
-    YEAR_OF_BIRTH = (By.CSS_SELECTOR, f"option[value='{SP[0]}']")
-    SELECT_DAY = (By.XPATH, f"//div[@class='react-datepicker__month']//*[contains(text(),"
-                            f" {SP[2]})]")
+    SELECT_MONTH = (By.CSS_SELECTOR, "select[class='react-datepicker__month-select'] option")
+    SELECT_YEAR = (By.CSS_SELECTOR, "select[class='react-datepicker__year-select'] option")
+    SELECT_DAY = (By.CSS_SELECTOR, "div[class^='react-datepicker__day react-datepicker__day--']")
     INPUT_SUBJECTS = (By.CSS_SELECTOR, "input[id='subjectsInput']")
     HOBBIES_CHECKBOX = ((By. CSS_SELECTOR, "label[for='hobbies-checkbox-1']"),
                         (By. CSS_SELECTOR, "label[for='hobbies-checkbox-2']"),

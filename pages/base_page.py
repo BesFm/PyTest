@@ -72,7 +72,7 @@ class BasePage(ABC):
         action.context_click(element)
         action.perform()
 
-    def action_move_to(self, element):
+    def action_hover(self, element):
         action = ActionChains(self.driver)
         action.move_to_element(element)
         action.perform()

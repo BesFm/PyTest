@@ -1,5 +1,3 @@
-import random
-
 import allure
 
 from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonPage, LinkPage, \
@@ -66,7 +64,7 @@ class TestElements:
         def test_web_table_delete_person_info(self, driver):
             web_table_page = WebTablePage(driver, "https://demoqa.com/webtables")
             web_table_page.open()
-            assert web_table_page, "The Person card hasn't been deleted or hasn't been added"
+            assert web_table_page.check_deleting_function(), "The Person card hasn't been deleted or hasn't been added"
 
         @allure.title("Web Table: Change row count")
         def test_web_table_change_count_row(self, driver):
@@ -86,7 +84,7 @@ class TestElements:
                                                                'You have done a dynamic click')
 
     @allure.feature("Links")
-    class TestLinksPage:
+    class TestLinks:
         @allure.title("Test normal links")
         def test_check_link(self, driver):
             link_page = LinkPage(driver, "https://demoqa.com/links")

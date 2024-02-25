@@ -7,7 +7,6 @@ import allure
 import requests
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
-
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
     WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UpDownLoadPageLocators, DynamicPropertiesPageLocators
 from pages.base_page import BasePage
@@ -15,7 +14,7 @@ from generator.generator import generated_person, generated_file
 
 
 class TextBoxPage(BasePage):
-    locators = TextBoxPageLocators()
+    locators = TextBoxPageLocators
 
     @allure.step("Filling all fields")
     def fill_all_fields(self):
@@ -28,8 +27,10 @@ class TextBoxPage(BasePage):
             self.element_is_visible(self.locators.FULL_NAME).send_keys(full_name)
             self.element_is_visible(self.locators.EMAIL).send_keys(email)
             self.element_is_visible(self.locators.CURRENT_ADDRESS).send_keys(current_address)
+            self.go_to_element(self.element_is_present(self.locators.PERMANENT_ADDRESS))
             self.element_is_visible(self.locators.PERMANENT_ADDRESS).send_keys(permanent_address)
         with allure.step("Click Submit"):
+            self.go_to_element(self.element_is_present(self.locators.SUBMIT))
             self.element_is_clickable(self.locators.SUBMIT).click()
         return full_name, email, current_address, permanent_address
 
@@ -95,17 +96,17 @@ class RadioButtonPage(BasePage):
             self.element_is_visible(choices[choice]).click()
 
     @allure.step("Get output radiobutton")
-    def get_output_radiobutton(self):
+    def get_output_radiobutton_text(self):
         return self.element_is_present(self.locators.CHOSEN_RADIO).text
 
     @allure.step("Select and Get selected radiobutton")
     def select_and_get_selected_radiobutton(self):
         self.click_radio_button('yes')
-        output_yes = self.get_output_radiobutton()
+        output_yes = self.get_output_radiobutton_text()
         self.click_radio_button('impressive')
-        output_impressive = self.get_output_radiobutton()
+        output_impressive = self.get_output_radiobutton_text()
         self.click_radio_button('no')
-        output_no = self.get_output_radiobutton()
+        output_no = self.get_output_radiobutton_text()
         return output_yes, output_impressive, output_no
 
 
@@ -113,7 +114,7 @@ class WebTablePage(BasePage):
     locators = WebTablePageLocators()
 
     @allure.step("Add new persons")
-    def add_new_person(self, count=2):
+    def add_new_person(self, count=2) -> list[str]:
         person_list = []
         while count > 0:
             person_info = next(generated_person())
@@ -138,7 +139,7 @@ class WebTablePage(BasePage):
         return random.choice(person_list)
 
     @allure.step("Get person info")
-    def get_new_person_info(self):
+    def get_new_person_info(self) -> list[str]:
         time.sleep(0.5)
         person_info = self.elements_are_present(self.locators.PERSON_INFO)
         data = []
@@ -151,7 +152,7 @@ class WebTablePage(BasePage):
         self.element_is_visible(self.locators.SEARCH_FIELD).send_keys(key_words)
 
     @allure.step("Update person info")
-    def update_person_info(self):
+    def update_person_info(self) -> str:
         person_info = next(generated_person())
         age = person_info.age
         self.element_is_visible(self.locators.UPDATE_BUTTON).click()
@@ -252,11 +253,8 @@ class LinkPage(BasePage):
                         "invalid-url": self.locators.NOT_FOUND_LINK}
         for handle, element in links_dictic.items():
             request = requests.get(f"{link_href}{handle}")
-            if request.status_code == 200:
-                self.element_is_present(element).click()
-                status_list.append(request.status_code)
-            else:
-                status_list.append(request.status_code)
+            self.element_is_present(element).click()
+            status_list.append(request.status_code)
         return status_list
 
 
@@ -277,10 +275,9 @@ class UpDownLoadPage(BasePage):
         link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute("href")
         link_b = base64.b64decode(link.split(",")[1])
         path_name_file = rf"C:\Users\Bes.fm\Downloads\filetest{random.randint(0, 500)}.jpeg"
-        with open(path_name_file, "wb+") as f:
-            f.write(link_b)
+        with open(path_name_file, "wb+") as file:
+            file.write(link_b)
             check_file = os.path.exists(path_name_file)
-            f.close()
         time.sleep(3)
         os.remove(path_name_file)
         return check_file

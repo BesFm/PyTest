@@ -1,5 +1,5 @@
 import os
-from typing import Any, Tuple, LiteralString
+from typing import Any, LiteralString
 
 import allure
 from selenium.webdriver import Keys
@@ -39,7 +39,7 @@ class FormsPage(BasePage):
         return self.element_is_visible(self.locators.GENDER_RADIO[r]).text
 
     @allure.step("Set date of birth")
-    def set_birth_data(self) -> tuple[Any, Any, Any]:
+    def set_birth_date(self) -> tuple[Any, Any, Any]:
         date = next(generated_date())
         self.element_is_visible(self.locators.DATE_OF_BIRTH).click()
         self.set_date_by_text(self.locators.SELECT_MONTH, date.month)
@@ -87,8 +87,8 @@ class FormsPage(BasePage):
     def get_output_info(self) -> list[str]:
         student_info = self.elements_are_visible(self.locators.OUTPUT_INFO)
         data = []
-        for i in student_info:
-            data.append(i.text)
+        for row in student_info:
+            data.append(row.text)
         self.element_is_visible(self.locators.CLOSE_TABLE).click()
         return data
 
@@ -96,7 +96,7 @@ class FormsPage(BasePage):
     def send_input_info(self) -> list[str]:
         firstname, lastname, email, mobile, subjects, address = self.fill_inputs()
         gender = self.click_radio_butt()
-        day, month, year = self.set_birth_data()
+        day, month, year = self.set_birth_date()
         hobbies = self.click_all_checkboxes()
         filename = self.upload_file()
         state_city = self.set_state_city()

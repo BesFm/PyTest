@@ -25,7 +25,7 @@ class FramePageLocators:
     RESPONSE_FRAME = (By.CSS_SELECTOR, "h1[id='sampleHeading']")
 
 
-class NestedFramesLocators:
+class NestedFrameLocators:
 
     LARGE_FRAME = (By.CSS_SELECTOR, "iframe[id='frame1']")
     SMALL_FRAME = (By.CSS_SELECTOR, "iframe[srcdoc='<p>Child Iframe</p>']")

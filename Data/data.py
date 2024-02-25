@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass
@@ -23,3 +24,7 @@ class Date:
     month: str = None
     day: str = None
     time: str = None
+
+
+class Answers(Enum):
+    YES = "YES"

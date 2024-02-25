@@ -1,51 +1,61 @@
 import allure
 
 from conftest import driver
-from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage, DraggablePage
+from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, \
+    DroppablePage, DraggablePage
 
 
 @allure.suite("Test Interactions")
 class TestInteractions:
-
     @allure.feature("Test Sortable")
     class TestSortable:
 
-        @allure.title("Check sorted elements")
-        def test_sortable(self, driver):
+        @allure.title("Check sorted elements of list")
+        def test_sortable_list(self, driver):
             sortable_page = SortablePage(driver, "https://demoqa.com/sortable")
             sortable_page.open()
-            unsorted_lists, sorted_lists = sortable_page.change_elements_positions()
-            assert len(unsorted_lists[0]) == len(sorted_lists[0]) and unsorted_lists[0] != sorted_lists[0], \
-                "Grid elements isn't replaced"
-            assert len(unsorted_lists[1]) == len(sorted_lists[1]) and unsorted_lists[1] != sorted_lists[1], \
-                "List elements isn't replaced"
+            assert sortable_page.check_elements_sorting(
+                "list"), "List elements hasn't been sorted"
+
+        @allure.title("Check sorted elements of grid")
+        def test_sortable_grid(self, driver):
+            sortable_page = SortablePage(driver, "https://demoqa.com/sortable")
+            sortable_page.open()
+            assert sortable_page.check_elements_sorting(
+                "grid"), "Grid element's hasn't been sorted"
 
     @allure.feature("Test Selectable")
     class TestSelectable:
 
-        @allure.title("Check Sorted elements")
-        def test_selectable(self, driver):
+        @allure.title("Check Sorted elements of list")
+        def test_selectable_list(self, driver):
             selectable_page = SelectablePage(driver, "https://demoqa.com/selectable")
             selectable_page.open()
-            list_elements, list_approved = selectable_page.select_elements("list")
-            grid_elements, grid_approved = selectable_page.select_elements("grid")
-            assert len(list_elements) == 3 and list_approved, "List elements isn't selected"
-            assert len(grid_elements) == 3 and grid_approved, "Grid elements isn't selected"
+            assert selectable_page.check_selected_elements(
+                "list"), "List elements hasn't been selected"
+
+        @allure.title("Check Sorted elements of grid")
+        def test_selectable_grid(self, driver):
+            selectable_page = SelectablePage(driver, "https://demoqa.com/selectable")
+            selectable_page.open()
+            assert selectable_page.check_selected_elements(
+                "grid"), "Grid elements isn't selected"
 
     @allure.feature("Test Resizable")
     class TestResizable:
 
-        @allure.title("Check resized window")
-        def test_resizable(self, driver):
+        @allure.title("Check resized box window")
+        def test_resizable_box(self, driver):
             resizable_page = ResizablePage(driver, "https://demoqa.com/resizable")
             resizable_page.open()
-            resizable_page.remove_element()
-            box_sizes = resizable_page.resize_window("box window")
-            simple_sizes = resizable_page.resize_window("simple window")
-            assert box_sizes[0] != box_sizes[1] != box_sizes[2], "Box-window size isn't changed"
-            assert box_sizes[1][0] <= 500 and box_sizes[1][1] <= 300, "Max size box-window exceeded"
-            assert box_sizes[2][0] >= 150 and box_sizes[2][1] >= 150, "Min size box-window exceeded"
-            assert simple_sizes[0] != simple_sizes[1] != simple_sizes[2], "Simple-window isn't changed"
+            test_result, message = resizable_page.check_resizing_of_box_window()
+            assert test_result, message
+
+        @allure.title("Check resized simple window")
+        def test_resizable_simple(self, driver):
+            resizable_page = ResizablePage(driver, "https://demoqa.com/resizable")
+            resizable_page.open()
+            assert resizable_page.check_resizing_of_simple_window(), "Simple-window isn't changed"
 
     @allure.feature("Test Droppable")
     class TestDroppable:
@@ -54,8 +64,7 @@ class TestInteractions:
         def test_simple_tab(self, driver):
             droppable_page = DroppablePage(driver, "https://demoqa.com/droppable")
             droppable_page.open()
-            simple_target_text = droppable_page.move_simple_box()
-            assert simple_target_text == "Dropped!", "Element isn't moved to target or target hasn't react"
+            assert droppable_page.move_simple_box == "Dropped!", "Element isn't moved to target or target hasn't react"
 
         @allure.title("Test element at accept tab")
         def test_accept_tab(self, driver):
@@ -65,61 +74,61 @@ class TestInteractions:
             assert not_accept_text == "Drop here", "Target react at wrong element or has been react before"
             assert accept_text == "Dropped!", "Element isn't moved to target or target hasn't react"
 
-        @allure.title("Test element at prevent propagation tab")
+        @allure.title("Test element at prevent propagation tab - Not Greedy container")
+        def test_not_greedy_tab(self, driver):
+            droppable_page = DroppablePage(driver, "https://demoqa.com/droppable")
+            droppable_page.open()
+            outer_container, inner_container = droppable_page.move_box_to_not_greedy_container()
+            assert outer_container == inner_container, "One of the target is greedy while it shouldn't be"
+
+        @allure.title("Test element at prevent propagation tab - Not Greedy container")
         def test_greedy_tab(self, driver):
             droppable_page = DroppablePage(driver, "https://demoqa.com/droppable")
             droppable_page.open()
-            greedy_page_result = droppable_page.move_greedy_box()
-            assert greedy_page_result[0][0] == greedy_page_result[0][1], ("One of the target is greedy"
-                                                                          " while it shouldn't be")
-            assert greedy_page_result[1][0] != greedy_page_result[1][1], ("One of the target isn't greedy"
-                                                                          " while it should be")
-            assert greedy_page_result[2][0] == greedy_page_result[2][1], ("Element hasn't been moved to second target"
-                                                                          "or target isn't react")
+            test_result, message = droppable_page.check_moving_to_greedy_container()
+            assert test_result, message  # в модуле page генерируется сообщение ошибки в зависимости от ошибки
 
         @allure.title("Test element at revert draggable tab")
         def test_revert_tab(self, driver):
             droppable_page = DroppablePage(driver, "https://demoqa.com/droppable")
             droppable_page.open()
-            result_text, moving_assignment = droppable_page.move_revertable_box(move_type="will revert")
+            result_text, moving_assignment = droppable_page.move_revertable_box(
+                move_type="will revert")
+            assert result_text == "Dropped!", "Element isn't moved to target or target hasn't react"
+            assert moving_assignment, "Element ISN'T MOVE back while it should or element MOVE back when it shouldn't"
+
+        @allure.title("Test element at revert draggable tab")
+        def test_revert_tab(self, driver):
+            droppable_page = DroppablePage(driver, "https://demoqa.com/droppable")
+            droppable_page.open()
+            result_text, moving_assignment = droppable_page.move_revertable_box(
+                move_type="not revert")
             assert result_text == "Dropped!", "Element isn't moved to target or target hasn't react"
             assert moving_assignment, "Element ISN'T MOVE back while it should or element MOVE back when it shouldn't"
 
     @allure.feature("Test Draggable")
     class TestDraggable:
 
-        @allure.step("Test element at Simple tab")
+        @allure.title("Test element at Simple tab")
         def test_simple_tab(self, driver):
             draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
             draggable_page.open()
-            previous_position, result_position_x, result_position_y = draggable_page.move_simple_element()
-            assert previous_position != result_position_x and result_position_x != 0, "Element hasn't been moved"
-            assert previous_position != result_position_y and result_position_y != 0, "Element hasn't been moved"
+            assert draggable_page.check_moving_simple_element(), "Element hasn't been moved"
 
-        @allure.step("Test element at Axis Restricted tab")
+        @allure.title("Test element at Axis Restricted tab")
         def test_axis_restricted_tab(self, driver):
             draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
             draggable_page.open()
-            elements_coords = draggable_page.move_chosen_tab_element(tab="axis")
-            assert (elements_coords[0] != elements_coords[2] and
-                    elements_coords[0] != elements_coords[3]), "Element hasn't been moved"
-            # проверяем что x изменился, а y не изменился
-            assert elements_coords[2] != 0 and elements_coords[3] == 0, "Element has been moved through wrong axes"
-            assert (elements_coords[1] != elements_coords[4] and
-                    elements_coords[1] != elements_coords[5]), "Element hasn't been moved"
-            # проверяем что y изменился, а x не изменился
-            assert elements_coords[4] == 0 and elements_coords[5] != 0, "Element has been moved through wrong axes"
+            assert draggable_page.check_moving_axis_element(
+                "y_element"), "'Y' element hasn't been moved or made x move"
+            assert draggable_page.check_moving_axis_element(
+                "x_element"), "'X' element hasn't been moved or made y move"
 
-        @allure.step("Test element at Container Restricted tab")
+        @allure.title("Test element at Container Restricted tab")
         def test_container_restricted_tab(self, driver):
             draggable_page = DraggablePage(driver, "https://demoqa.com/dragabble")
             draggable_page.open()
-            elements_coords = draggable_page.move_chosen_tab_element(tab="container")
-            assert (elements_coords[0] != elements_coords[2] and
-                    elements_coords[0] != elements_coords[3]), "Element hasn't been moved"
-            # проверяем что елемент не вышел за границы допустимых координат
-            assert elements_coords[2] <= 655 and elements_coords[3] <= 106, "Element has been moved through border"
-            assert (elements_coords[1] != elements_coords[4] and
-                    elements_coords[1] != elements_coords[5]), "Element hasn't been moved"
-            # проверяем что елемент не вышел за границы допустимых координат
-            assert elements_coords[4] <= 13 and elements_coords[5] <= 86, "Element has been moved through border"
+            assert draggable_page.check_moving_container_element("box_contained"), \
+                "Box contained element hasn't been moved or moved over the box border"
+            assert draggable_page.check_moving_container_element("parent_contained"), \
+                "Parent contained element hasn't been moved or moved over the parent border"

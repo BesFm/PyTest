@@ -92,18 +92,13 @@ class SelectMenuPageLocators:
 
     SELECT_VALUE = (By.XPATH, "//*[contains(text(),'Select Option')]")
     SELECT_VALUE_DROPDOWN = (By.XPATH, "//*[contains(@id, 'react-select-2-option')]")
-    GET_VALUE_TITLE = (By.CSS_SELECTOR, "div[class=' css-1uccc91-singleValue']")
+    GET_VALUE_CONTENT = (By.CSS_SELECTOR, "div[id='withOptGroup'] div[class=' css-1uccc91-singleValue'] ")
 
     SELECT_TITLE = (By.XPATH, "//*[contains(text(), 'Select Title')]")
     SELECT_TITLE_DROPDOWN = (By.XPATH, "//*[contains(@id, 'react-select-3-option')]")
+    GET_TITLE_CONTENT = (By.CSS_SELECTOR, "div[id='selectOne'] div[class=' css-1uccc91-singleValue'] ")
 
     SELECT_COLORS = (By.XPATH, "//div[7]//*[contains(@class, ' css-tlfecz-indicatorContainer')][1]")
     SELECT_COLORS_DROPDOWN = (By.XPATH, "//*[contains(@id, 'react-select-4-option')]")
-    REMOVE_COLORS = (By.CSS_SELECTOR, "svg[class='css-19bqh2r'][width='14']")
+    REMOVE_COLOR = (By.CSS_SELECTOR, "svg[class='css-19bqh2r'][width='14']")
     GET_COLOR_VALUE = (By.CSS_SELECTOR, "div[class='css-1rhbuit-multiValue']")
-
-    SELECT_OLD_COLOR = (By.CSS_SELECTOR, "select[id='oldSelectMenu']")
-    SELECT_OLD_COLOR_DROPDOWN = (By.CSS_SELECTOR, "select[id='oldSelectMenu'] option")
-
-    SELECT_OLD_CAR = (By.CSS_SELECTOR, "select[id='cars']")
-    SELECT_OLD_CAR_DROPDOWN = (By.CSS_SELECTOR, "select[id='cars'] option")
